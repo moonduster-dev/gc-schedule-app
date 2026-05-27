@@ -27,6 +27,12 @@
     .spinner { border: 3px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin .7s linear infinite; display:inline-block; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .row-highlight { background-color: #fef9c3 !important; }
+    @media (max-width: 640px) {
+      #schedule-table { font-size: 0.8rem; }
+      #schedule-table th, #schedule-table td { padding: 0.4rem 0.5rem; }
+      .col-division { display: none; }
+      .col-location { display: none; }
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -77,9 +83,6 @@
     <span class="text-sm text-gray-400 self-center">Try:</span>
     <button onclick="exampleQ(this)" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-3 py-1">When does Sophia play next?</button>
     <button onclick="exampleQ(this)" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-3 py-1">What games are this weekend?</button>
-    <button onclick="exampleQ(this)" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-3 py-1">Who plays on July 11?</button>
-    <button onclick="exampleQ(this)" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-3 py-1">What teams play at nationals?</button>
-    <button onclick="exampleQ(this)" class="text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-3 py-1">GameChanger URL for Lady Jackets 16B?</button>
   </div>
 
   <!-- Always-visible input row -->
@@ -101,10 +104,10 @@
         <tr>
           <th class="px-4 py-3 text-left font-semibold cursor-pointer select-none" onclick="sortBy('date')" title="Sort by date">Date <span id="sort-date" class="text-gray-400">↕</span></th>
           <th class="px-4 py-3 text-left font-semibold">Player(s)</th>
-          <th class="px-4 py-3 text-left font-semibold">Division / Team</th>
+          <th class="px-4 py-3 text-left font-semibold col-division">Division / Team</th>
           <th class="px-4 py-3 text-left font-semibold">Opponent</th>
           <th class="px-4 py-3 text-left font-semibold">Time</th>
-          <th class="px-4 py-3 text-left font-semibold">Location</th>
+          <th class="px-4 py-3 text-left font-semibold col-location">Location</th>
         </tr>
       </thead>
       <tbody id="schedule-tbody"></tbody>
@@ -620,10 +623,10 @@ function renderTable() {
     return `<tr class="${borderTop} hover:bg-yellow-50 transition-colors">
       <td class="px-4 py-3 whitespace-nowrap" style="border-left:3px solid ${c.dot}">${formatDateDisplay(row.Date, row.Day)}</td>
       <td class="px-4 py-3" style="max-width:160px">${playerChips}</td>
-      <td class="px-4 py-3"><span class="text-gray-500 text-sm">${escHtml(row.Division||'')}</span><br><span class="font-medium text-gray-800">${escHtml(row.Team||'')}</span></td>
+      <td class="px-4 py-3 col-division"><span class="text-gray-500 text-sm">${escHtml(row.Division||'')}</span><br><span class="font-medium text-gray-800">${escHtml(row.Team||'')}</span></td>
       <td class="px-4 py-3 font-medium text-gray-800">${escHtml(row.Opponent||'')}${haDir}</td>
       <td class="px-4 py-3 whitespace-nowrap">${timeHtml}</td>
-      <td class="px-4 py-3">${locHtml}</td>
+      <td class="px-4 py-3 col-location">${locHtml}</td>
     </tr>`;
   });
 

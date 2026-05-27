@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GC Player Schedule Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    html { height: 100%; }
+    body { height: 100%; display: flex; flex-direction: column; font-family: system-ui, sans-serif; }
+    #main-area { flex: 1; overflow: auto; }
+    #chat-panel { max-height: 420px; transition: max-height .3s ease; }
+    #chat-panel.collapsed { max-height: 52px; }
+    #chat-messages { overflow-y: auto; max-height: 280px; }
+    .prose table { width: 100%; border-collapse: collapse; }
+    .prose table td, .prose table th { border: 1px solid #e5e7eb; padding: 4px 8px; text-align: left; }
+    .prose ul { padding-left: 1.25rem; list-style-type: disc; }
+    .prose ol { padding-left: 1.25rem; list-style-type: decimal; }
+    .prose p { margin-bottom: .5rem; }
+    .prose strong { font-weight: 600; }
+    .prose code { background:#f1f5f9;padding:1px 4px;border-radius:3px;font-size:.85em; }
+    #schedule-table th { position: sticky; top: 0; z-index: 2; }
+    .location-link { color: #2563eb; text-decoration: underline; cursor: pointer; }
+    .location-link:hover { color: #1d4ed8; }
+    input[type=date]::-webkit-calendar-picker-indicator { cursor:pointer; }
+    .spinner { border: 3px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin .7s linear infinite; display:inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .row-highlight { background-color: #fef9c3 !important; }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- ===== HEADER ===== -->
+<header class="bg-blue-900 text-white px-5 py-3 flex items-center gap-4 shadow-lg flex-shrink-0">
+  <div>
+    <h1 class="text-lg font-bold leading-tight">GC Player Schedule Hub</h1>
+    <p class="text-blue-300 text-xs">OLC &amp; travel softball — ask questions about any player or team</p>
+  </div>
+  <div class="ml-auto flex items-center gap-3">
+    <span id="data-badge" class="text-xs px-2 py-1 rounded-full bg-blue-800 text-blue-200 border border-blue-700">Loading…</span>
+    <span id="row-count" class="text-xs text-blue-300"></span>
+  </div>
+</header>
+
+<!-- ===== FILTER BAR ===== -->
+<div class="bg-white border-b shadow-sm px-4 py-2 flex flex-wrap gap-3 items-center flex-shrink-0" id="filter-bar">
+  <div class="flex items-center gap-1.5">
+    <label class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Players</label>
+    <div id="player-filters" class="flex flex-wrap gap-1"></div>
+    <button onclick="clearPlayerFilter()" class="text-xs text-blue-600 hover:underline ml-1">All</button>
+  </div>
+  <div class="flex items-center gap-1.5 ml-auto">
+    <label class="text-xs font-semibold text-gray-600 uppercase tracking-wide">From</label>
+    <input type="date" id="date-from" class="text-xs border rounded px-1.5 py-1 focus:outline-blue-400">
+    <label class="text-xs font-semibold text-gray-600 uppercase tracking-wide">To</label>
+    <input type="date" id="date-to" class="text-xs border rounded px-1.5 py-1 focus:outline-blue-400">
+    <button onclick="clearDateFilter()" class="text-xs text-blue-600 hover:underline">Clear</button>
+  </div>
+</div>
+
+<!-- ===== MAIN SCHEDULE TABLE ===== -->
+<div id="main-area" class="p-3">
+  <div id="loading-msg" class="text-center text-gray-400 py-10">Loading schedule…</div>
+  <div id="table-wrap" class="hidden overflow-x-auto rounded-lg shadow-sm border border-gray-200">
+    <table id="schedule-table" class="w-full text-sm bg-white">
+      <thead class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wide border-b">
+        <tr>
+          <th class="px-3 py-2 text-left font-semibold cursor-pointer select-none" onclick="sortBy('date')" title="Sort by date">Date <span id="sort-date" class="text-gray-400">↕</span></th>
+          <th class="px-3 py-2 text-left font-semibold">Player(s)</th>
+          <th class="px-3 py-2 text-left font-semibold">Division / Team</th>
+          <th class="px-3 py-2 text-left font-semibold">Opponent</th>
+          <th class="px-3 py-2 text-left font-semibold">Time</th>
+          <th class="px-3 py-2 text-left font-semibold">Location</th>
+        </tr>
+      </thead>
+      <tbody id="schedule-tbody"></tbody>
+    </table>
+  </div>
+  <p id="no-results" class="hidden text-center text-gray-400 py-10">No games match the current filters.</p>
+</div>
+
+<!-- ===== CHAT PANEL ===== -->
+<div id="chat-panel" class="bg-white border-t border-gray-200 shadow-2xl flex-shrink-0 collapsed flex flex-col">
+  <!-- Chat Header / Toggle -->
+  <div class="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100 cursor-pointer select-none" onclick="toggleChat()">
+    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3-3-3z"/></svg>
+    <span class="text-sm font-semibold text-gray-700">Ask a question about the schedule</span>
+    <span id="chat-toggle-icon" class="ml-auto text-gray-400 text-lg leading-none">▲</span>
+    <span id="chat-thinking" class="hidden ml-2"><span class="spinner"></span></span>
+  </div>
+
+  <!-- Messages -->
+  <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-2 space-y-2 hidden"></div>
+
+  <!-- Examples row -->
+  <div id="chat-examples" class="px-4 py-1 flex flex-wrap gap-1.5 hidden">
+    <span class="text-xs text-gray-500 mr-1 self-center">Try:</span>
+    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">When does Sophia play next?</button>
+    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">What games are this weekend?</button>
+    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">Who plays on July 11?</button>
+    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">Show MD Crush National 18U schedule</button>
+    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">What teams play at nationals?</button>
+    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">GameChanger URL for Lady Jackets 16B?</button>
+  </div>
+
+  <!-- Input row -->
+  <div class="hidden px-3 py-2.5 border-t border-gray-100 flex gap-2" id="chat-input-row">
+    <input id="chat-input" type="text" placeholder="Ask about players, schedules, teams, or locations…"
+      class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      onkeydown="if(event.key==='Enter')sendQuestion()">
+    <button onclick="sendQuestion()" class="bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition">Ask</button>
+  </div>
+</div>
+
+<!-- ===== DATA ===== -->
+<script>
+const SHEETS_URL = 'https://docs.google.com/spreadsheets/d/1TefMflV31mWBIhuSY8Bui5e20-0SrOfo/export?format=csv&gid=1745228852';
+
+const EMBEDDED_CSV = `Player,Division,Team,Date,Day,Opponent,Home/Away,Time,Location
+Emery Stup (7),12UA,Maryland Fever 12U Miller,5/20/2026,Wed,vs. Damascus Lady Jackets 12U,Home,6:00 PM,
+Juliet Rickman (8),12UB,Damascus Lady Jackets 12U,5/20/2026,Wed,vs. Maryland Fever 12U Miller,,6:15 PM,
+Emery Stup (7),12UA,Maryland Fever 12U Miller,5/21/2026,Thu,vs. Maryland Heartbreakers 12U,Home,6:30 PM,
+Stella (GC),16UB,Lady Jackets 16B,5/22/2026,Fri,vs. TBD,,All Day,
+Ashley (GC),14UB,Lady Jackets 14B,5/23/2026,Sat,vs. RITG-LFC 14U Schmeiser Palmer,,8:00 AM,Antrim Township Community Park - Field 4
+Ashley (GC),14UB,Lady Jackets 14B,5/23/2026,Sat,vs. Gold Coast Hurricanes-SAC Harris,,9:30 AM,Antrim Township Community Park - Field 4
+Ashley (GC),14UB,Lady Jackets 14B,5/23/2026,Sat,vs. Rise Up 14U,,12:30 PM,Antrim Township Community Park - Field 3
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/23/2026,Sat,vs. Bayside Blues,,11:00 AM,Pinesburg Softball Complex - Field 4
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/23/2026,Sat,vs. Zero Tolerance,,2:00 PM,Pinesburg Softball Complex - Field 4
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/23/2026,Sat,vs. Maryland Integrity 15U,,3:30 PM,Pinesburg Softball Complex - Field 3
+Cayla (GC),16UA,MD Heartbreakers 16U,5/23/2026,Sat,vs. Bayside Blues,,9:30 AM,Pinesburg Softball Complex - Field 4
+Cayla (GC),16UA,MD Heartbreakers 16U,5/23/2026,Sat,vs. Zero Tolerance,,11:00 AM,Pinesburg Softball Complex - Field 2
+Cayla (GC),16UA,MD Heartbreakers 16U,5/23/2026,Sat,vs. Maryland Integrity 15U,,2:00 PM,Pinesburg Softball Complex - Field 2
+Charli Glass (7),11UB,Maryland InteGRITy 2014,5/23/2026,Sat,vs. Revolution McLaughlin 11U,,11:00 AM,Claude Moore Park - Field 8
+Charli Glass (7),11UB,Maryland InteGRITy 2014,5/23/2026,Sat,vs. Delaware Express 11U Blue,,2:00 PM,Claude Moore Park - Field 8
+Charli Glass (7),11UB,Maryland InteGRITy 2014,5/23/2026,Sat,vs. Victory Gold 11U,,3:30 PM,Claude Moore Park - Field 8
+Clara (GC),14UB,Freedom Firebirds-Petry,5/23/2026,Sat,vs. Valley Forge Patriots 13u-Najmola,,8:00 AM,Guilford Sports Complex - Field 2
+Clara (GC),14UB,Freedom Firebirds-Petry,5/23/2026,Sat,vs. Honeygo Hurricanes 13u,,10:50 AM,Guilford Sports Complex - Field 2
+Clara (GC),14UB,Freedom Firebirds-Petry,5/23/2026,Sat,vs. Maryland Express Benler,,12:15 PM,Guilford Sports Complex - Field 2
+Grace (GC),18UA,MD Stars Fastpitch DiM/Parson,5/23/2026,Sat,vs. Severn Select 18U-Wilkens,,8:00 AM,Pinesburg Softball Complex - Field 4
+Grace (GC),18UA,MD Stars Fastpitch DiM/Parson,5/23/2026,Sat,vs. Maryland Integrity 09,,11:00 AM,Pinesburg Softball Complex - Field 1
+Grace (GC),18UA,MD Stars Fastpitch DiM/Parson,5/23/2026,Sat,vs. Maryland Crush National,,12:30 PM,Pinesburg Softball Complex - Field 4
+Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,5/23/2026,Sat,vs. 18u Heartbreakers Gold National,,8:00 AM,Pinesburg Softball Complex - Field 2
+Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,5/23/2026,Sat,vs. NY Lady Nightmares 18U Burgos,,9:30 AM,Pinesburg Softball Complex - Field 1
+Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,5/23/2026,Sat,vs. Maryland Stars Fastpitch DiM/Parson,,12:30 PM,Pinesburg Softball Complex - Field 4
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,5/23/2026,Sat,vs. Freedom Firebirds Miller 11U,,9:30 AM,Marty Snook Park - Field 3
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,5/23/2026,Sat,vs. Nazareth Blast 11U,,11:00 AM,Marty Snook Park - Field 3
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,5/23/2026,Sat,vs. PA Chaos 11U Hagarty,,2:00 PM,Marty Snook Park - Field 2
+Sophia (GC),14UB,Green Wave 14U,5/23/2026,Sat,vs. Loudoun Inferno 14U - Moore,,8:00 AM,Hagerstown Fairgrounds Softball Complex - Field 3
+Sophia (GC),14UB,Green Wave 14U,5/23/2026,Sat,vs. Keystone State Bombers 14U Felix,,9:30 AM,Hagerstown Fairgrounds Softball Complex - Field 3
+Sophia (GC),14UB,Green Wave 14U,5/23/2026,Sat,vs. SMASH Fastpitch Shaffer,,12:30 PM,Hagerstown Fairgrounds Softball Complex - Field 3
+Ashley (GC),14UB,Lady Jackets 14B,5/24/2026,Sun,vs. PA Chaos National 2030,,8:00 AM,Hagerstown Fairgrounds Softball Complex - Field 3
+Ashley (GC),14UB,Lady Jackets 14B,5/24/2026,Sun,vs. Delaware Express 13U,,9:30 AM,Hagerstown Fairgrounds Softball Complex - Field 3
+Ashley (GC),14UB,Lady Jackets 14B,5/24/2026,Sun,vs. Starz Gold 2030 NOVA,,12:30 PM,Hagerstown Fairgrounds Softball Complex - Field 3
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/24/2026,Sun,vs. Jersey Intensity 14U Burzo National,,9:30 AM,Pinesburg Softball Complex - Field 4
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/24/2026,Sun,vs. Bayside Blues,,11:00 AM,Pinesburg Softball Complex - Field 3
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/24/2026,Sun,vs. Heartbreakers 16U,,2:00 PM,Pinesburg Softball Complex - Field 2
+Cayla (GC),16UA,MD Heartbreakers 16U,5/24/2026,Sun,vs. Jersey Intensity 14U Burzo National,,11:00 AM,Pinesburg Softball Complex - Field 2
+Cayla (GC),16UA,MD Heartbreakers 16U,5/24/2026,Sun,vs. MD Stars Fastpitch 2029,,2:00 PM,Pinesburg Softball Complex - Field 2
+Cayla (GC),16UA,MD Heartbreakers 16U,5/24/2026,Sun,vs. Zero Tolerance,,3:30 PM,Pinesburg Softball Complex - Field 3
+Charli Glass (7),11UB,Maryland InteGRITy 2014,5/24/2026,Sun,vs. TBD,,9:00 AM,
+Clara (GC),14UB,Freedom Firebirds-Petry,5/24/2026,Sun,vs. Delmarva Heat Downes 13u,,9:25 AM,St. Thomas Sports Complex - Gress 2
+Clara (GC),14UB,Freedom Firebirds-Petry,5/24/2026,Sun,vs. Freedom Fastpitch,,10:50 AM,St. Thomas Sports Complex - Gress 2
+Clara (GC),14UB,Freedom Firebirds-Petry,5/24/2026,Sun,vs. Vanquish Fastpitch 14u Karpovich,,1:40 PM,St. Thomas Sports Complex - Gress 2
+Grace (GC),18UA,MD Stars Fastpitch DiM/Parson,5/24/2026,Sun,vs. Rise Up 18U Select,,8:00 AM,Pinesburg Softball Complex - Field 4
+Grace (GC),18UA,MD Stars Fastpitch DiM/Parson,5/24/2026,Sun,vs. Heartbreakers 18u Elite,,9:30 AM,Pinesburg Softball Complex - Field 2
+Grace (GC),18UA,MD Stars Fastpitch DiM/Parson,5/24/2026,Sun,vs. Turn2,,12:30 PM,Pinesburg Softball Complex - Field 4
+Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,5/24/2026,Sun,vs. Turn2,,8:00 AM,Pinesburg Softball Complex - Field 3
+Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,5/24/2026,Sun,vs. Wagner's Huff 18U,,11:00 AM,Pinesburg Softball Complex - Field 1
+Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,5/24/2026,Sun,vs. Maryland InteGRITy,,12:30 PM,Pinesburg Softball Complex - Field 3
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,5/24/2026,Sun,vs. Delaware Express 11U,,8:00 AM,Kemp's Mill Park - Field 3
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,5/24/2026,Sun,vs. Maryland Lady Senators 11U,,9:30 AM,Kemp's Mill Park - Field 2
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,5/24/2026,Sun,vs. HEARTBREAKERS 11U,,12:30 PM,Kemp's Mill Park - Field 1
+Sophia (GC),14UB,Green Wave 14U,5/24/2026,Sun,vs. Gold Coast Hurricanes 13U Maurer,,11:00 AM,Antrim Township Community Park - Field 2
+Sophia (GC),14UB,Green Wave 14U,5/24/2026,Sun,vs. Rise Up 2030,,2:00 PM,Antrim Township Community Park - Field 2
+Sophia (GC),14UB,Green Wave 14U,5/24/2026,Sun,vs. VA Glory Johnston/Simon 14U,,3:30 PM,Antrim Township Community Park - Field 1
+Noelle Jennings (9),16UB,Chesapeake Wave,5/29/2026,Fri,vs. TBD,,All Day,
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/30/2026,Sat,vs. Maryland Patriots,,9:00 AM,River Hill High School - Varsity
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/30/2026,Sat,vs. Lady Senators 16u - Evans,,12:00 PM,River Hill High School - Varsity
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/30/2026,Sat,vs. Maryland Fever 2009,,3:00 PM,River Hill High School - Varsity
+Cayla (GC),16UA,MD Heartbreakers 16U,5/30/2026,Sat,vs. Bayside Blues,,9:00 AM,Marriotts Ridge High School - Varsity
+Cayla (GC),16UA,MD Heartbreakers 16U,5/30/2026,Sat,vs. Freedom Firebirds 16u,,12:00 PM,Marriotts Ridge High School - Junior Varsity
+Cayla (GC),16UA,MD Heartbreakers 16U,5/30/2026,Sat,vs. Northern Calvert Fury 16U - Hall,,3:00 PM,Marriotts Ridge High School - Junior Varsity
+Claire (GC),16UA,Olney Cougars 16U Anderson,5/30/2026,Sat,vs. Turn2,,12:00 PM,Western Regional Park - Field 2
+Claire (GC),16UA,Olney Cougars 16U Anderson,5/30/2026,Sat,vs. Maryland Fever 2007,,3:00 PM,Western Regional Park - Field 3
+Claire (GC),16UA,Olney Cougars 16U Anderson,5/30/2026,Sat,vs. Delaware Diamonds GOLD,,4:30 PM,Western Regional Park - Field 2
+Emery Stup (7),12UA,Maryland Fever 12U Miller,5/30/2026,Sat,vs. Starz Gold 12U Buxton,,10:30 AM,Glenelg High School - Varsity
+Emery Stup (7),12UA,Maryland Fever 12U Miller,5/30/2026,Sat,vs. Maryland Express 12U-Reaver,,3:00 PM,Glenelg High School - Varsity
+Emery Stup (7),12UA,Maryland Fever 12U Miller,5/30/2026,Sat,vs. Maryland Fever 12U Ryan,,4:30 PM,Glenelg High School - Varsity
+Emma Chavez (8),13UA,Maryland InteGRITy 13U,5/30/2026,Sat,vs. Maryland Patriots 14u Blue West,,9:00 AM,Alpha Ridge Park - Field 2
+Emma Chavez (8),13UA,Maryland InteGRITy 13U,5/30/2026,Sat,vs. Starz Gold 14U API,,10:30 AM,Alpha Ridge Park - Field 1
+Emma Chavez (8),13UA,Maryland InteGRITy 13U,5/30/2026,Sat,vs. Athletics Mercado Dolby 2030,,1:30 PM,Alpha Ridge Park - Field 2
+Lizzie (GC),18UB,BCC Flash,5/30/2026,Sat,vs. Lakeshore Lightning 18u Premier,,8:00 AM,Rehoboth Little League - Field 2
+Lizzie (GC),18UB,BCC Flash,5/30/2026,Sat,vs. Xtreme,,9:25 AM,Rehoboth Little League - Field 2
+Lizzie (GC),18UB,BCC Flash,5/30/2026,Sat,vs. Lady Black Sox,,12:15 PM,Rehoboth Little League - Field 2
+Lizzie (GC),18UB,BCC Flash,5/30/2026,Sat,vs. Kb Kryptonites 18b,,1:40 PM,Rehoboth Little League - Field 2
+Noelle Jennings (9),16UB,Chesapeake Wave,5/30/2026,Sat,vs. TBD,,All Day,
+Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,5/30/2026,Sat,vs. Rise Up 14U,,12:00 PM,Alpha Ridge Park - Field 3
+Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,5/30/2026,Sat,vs. Freedom Firebirds 2012,,1:30 PM,Alpha Ridge Park - Field 3
+Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,5/30/2026,Sat,vs. Gold Coast Hurricanes 13U Maurer,,4:30 PM,Alpha Ridge Park - Field 3
+Stella (GC),16UB,Lady Jackets 16B,5/30/2026,Sat,vs. STARS Goss 16U,,All Day,
+Aleida Kerkhoven (7),11UC,Shockwaves 11U,5/31/2026,Sun,@ Maryland Fever 12U Johns,Away,1:00 PM,
+Aleida Kerkhoven (7),11UC,Shockwaves 11U,5/31/2026,Sun,@ Maryland Fever 12U Johns,Away,3:00 PM,
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/31/2026,Sun,vs. Fever Frenzy - USA Eastern National Qualifier,,All Day,MD
+Cayla (GC),16UA,MD Heartbreakers 16U,5/31/2026,Sun,vs. Fever Frenzy - USA Eastern National Qualifier,,All Day,MD
+Claire (GC),16UA,Olney Cougars 16U Anderson,5/31/2026,Sun,vs. Fever Frenzy - USA Eastern National Qualifier,,All Day,MD
+Emery Stup (7),12UA,Maryland Fever 12U Miller,5/31/2026,Sun,vs. Fever Frenzy - USA Eastern National Qualifier,,All Day,MD
+Emma Chavez (8),13UA,Maryland InteGRITy 13U,5/31/2026,Sun,vs. Fever Frenzy - USA Eastern National Qualifier,,All Day,MD
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,5/31/2026,Sun,vs. Lady Jackets 16b,,1:00 PM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,5/31/2026,Sun,vs. Lady Jackets 16b,,3:00 PM,
+Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,5/31/2026,Sun,vs. Fever Frenzy - USA Eastern National Qualifier,,All Day,MD
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/5/2026,Fri,vs. USA Softball Summer Strikeout National Qualifier,,All Day,
+Noelle Jennings (9),16UB,Chesapeake Wave,6/5/2026,Fri,vs. TBD,,All Day,
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/6/2026,Sat,vs. USA Softball Summer Strikeout National Qualifier,,All Day,
+Charli Glass (7),11UB,Maryland InteGRITy 2014,6/6/2026,Sat,vs. TBD,,9:00 AM,
+Claire (GC),16UA,Olney Cougars 16U Anderson,6/6/2026,Sat,vs. Summer Strikeout (National Qualifier),,All Day,VA
+Noelle Jennings (9),16UB,Chesapeake Wave,6/6/2026,Sat,vs. TBD,,All Day,
+Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,6/6/2026,Sat,vs. Summer Strikeout (National Qualifier),,All Day,VA
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,6/6/2026,Sat,vs. Summer Strikeout (National Qualifier),,All Day,VA
+Sophia (GC),14UB,Green Wave 14U,6/6/2026,Sat,vs. Summer Strikeout (National Qualifier),,All Day,VA
+Stella (GC),16UB,Lady Jackets 16B,6/6/2026,Sat,vs. QUEEN OF DIAMONDS,,All Day,MD
+Aleida Kerkhoven (7),11UC,Shockwaves 11U,6/7/2026,Sun,@ No Limits 12U,Away,1:00 PM,
+Aleida Kerkhoven (7),11UC,Shockwaves 11U,6/7/2026,Sun,@ No Limits 12U,Away,3:00 PM,
+Charli Glass (7),11UB,Maryland InteGRITy 2014,6/7/2026,Sun,vs. TBD,,9:00 AM,
+Claire (GC),16UA,Olney Cougars 16U Anderson,6/7/2026,Sun,vs. Summer Strikeout (National Qualifier),,All Day,VA
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,6/7/2026,Sun,vs. TBD,,9:00 AM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,6/7/2026,Sun,vs. TBD,,3:00 PM,
+Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,6/7/2026,Sun,vs. Summer Strikeout (National Qualifier),,All Day,VA
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,6/7/2026,Sun,vs. Summer Strikeout (National Qualifier),,All Day,VA
+Sophia (GC),14UB,Green Wave 14U,6/7/2026,Sun,vs. Summer Strikeout (National Qualifier),,All Day,VA
+Stella (GC),16UB,Lady Jackets 16B,6/7/2026,Sun,vs. QUEEN OF DIAMONDS,,All Day,MD
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/12/2026,Fri,vs. USA Softball VA State Championship,,All Day,
+Noelle Jennings (9),16UB,Chesapeake Wave,6/12/2026,Fri,vs. TBD,,All Day,
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/13/2026,Sat,vs. USA Softball VA State Championship,,All Day,
+Cayla (GC),16UA,MD Heartbreakers 16U,6/13/2026,Sat,vs. GOVERNORS CUP FATHERS DAY BASH - 16u,,All Day,MD
+Charli Glass (7),11UB,Maryland InteGRITy 2014,6/13/2026,Sat,vs. TBD,,9:00 AM,
+MDR (GC),18UA,Olney Cougars 18U,6/13/2026,Sat,vs. GOVERNORS CUP FATHERS DAY BASH - 18u,,All Day,MD
+Noelle Jennings (9),16UB,Chesapeake Wave,6/13/2026,Sat,vs. Summer Fun Fest,,All Day,PA
+Aleida Kerkhoven (7),11UC,Shockwaves 11U,6/14/2026,Sun,vs. Mt. Airy Bulldogs 11U,,1:00 PM,
+Aleida Kerkhoven (7),11UC,Shockwaves 11U,6/14/2026,Sun,vs. Mt. Airy Bulldogs 11U,,3:00 PM,
+Cayla (GC),16UA,MD Heartbreakers 16U,6/14/2026,Sun,vs. GOVERNORS CUP FATHERS DAY BASH - 16u,,All Day,MD
+Charli Glass (7),11UB,Maryland InteGRITy 2014,6/14/2026,Sun,vs. TBD,,9:00 AM,
+MDR (GC),18UA,Olney Cougars 18U,6/14/2026,Sun,vs. GOVERNORS CUP FATHERS DAY BASH - 18u,,All Day,MD
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,6/14/2026,Sun,vs. TBD,,9:00 AM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,6/14/2026,Sun,vs. TBD,,3:00 PM,
+Noelle Jennings (9),16UB,Chesapeake Wave,6/14/2026,Sun,vs. Summer Fun Fest,,All Day,PA
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/18/2026,Thu,vs. PGF Super Select East Coast Championship,,All Day,
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/19/2026,Fri,vs. PGF Super Select East Coast Championship,,All Day,
+Charli Glass (7),11UB,Maryland InteGRITy 2014,6/19/2026,Fri,vs. TBD,,2:00 PM,
+Emma Zhao (8),13UB,Shockwaves 13U,6/19/2026,Fri,vs. TBD,,All Day,
+Noelle Jennings (9),16UB,Chesapeake Wave,6/19/2026,Fri,vs. TBD,,All Day,
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/20/2026,Sat,vs. PGF Super Select East Coast Championship,,All Day,
+Charli Glass (7),11UB,Maryland InteGRITy 2014,6/20/2026,Sat,vs. TBD,,9:00 AM,
+Emma Zhao (8),13UB,Shockwaves 13U,6/20/2026,Sat,vs. TBD,,All Day,
+Noelle Jennings (9),16UB,Chesapeake Wave,6/20/2026,Sat,vs. TBD,,All Day,
+Charli Glass (7),11UB,Maryland InteGRITy 2014,6/21/2026,Sun,vs. TBD,,9:00 AM,
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/26/2026,Fri,vs. USA Softball Cherry Bomb Tournament,,All Day,
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/27/2026,Sat,vs. USA Softball Cherry Bomb Tournament,,All Day,
+Cayla (GC),16UA,MD Heartbreakers 16U,6/27/2026,Sat,vs. Cherry Bomb,,All Day,VA
+Charli Glass (7),11UB,Maryland InteGRITy 2014,6/27/2026,Sat,vs. TBD,,9:00 AM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,6/27/2026,Sat,vs. TBD,,9:00 AM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,6/27/2026,Sat,vs. TBD,,1:00 PM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,6/27/2026,Sat,vs. TBD,,5:00 PM,
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,6/27/2026,Sat,vs. Cherry Bomb,,All Day,VA
+Sophia (GC),14UB,Green Wave 14U,6/27/2026,Sat,vs. Cherry Bomb,,All Day,VA
+Stella (GC),16UB,Lady Jackets 16B,6/27/2026,Sat,vs. BEAST OF EAST,,All Day,MD
+Cayla (GC),16UA,MD Heartbreakers 16U,6/28/2026,Sun,vs. Cherry Bomb,,All Day,VA
+Charli Glass (7),11UB,Maryland InteGRITy 2014,6/28/2026,Sun,vs. TBD,,9:00 AM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,6/28/2026,Sun,vs. TBD,,9:00 AM,
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,6/28/2026,Sun,vs. Cherry Bomb,,All Day,VA
+Sophia (GC),14UB,Green Wave 14U,6/28/2026,Sun,vs. Cherry Bomb,,All Day,VA
+Stella (GC),16UB,Lady Jackets 16B,6/28/2026,Sun,vs. BEAST OF EAST,,All Day,MD
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/4/2026,Sat,vs. TBD,,9:00 AM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/4/2026,Sat,vs. TBD,,1:00 PM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/4/2026,Sat,vs. TBD,,5:00 PM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/5/2026,Sun,vs. TBD,,9:00 AM,
+Claire (GC),16UA,Olney Cougars 16U Anderson,7/9/2026,Thu,vs. Summer Scorcher,,All Day,VA
+Noelle Jennings (9),16UB,Chesapeake Wave,7/9/2026,Thu,vs. TBD,,All Day,
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/10/2026,Fri,vs. USA Softball East Coast Showdown,,All Day,VA
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/10/2026,Fri,vs. USA Softball East Coast Showdown,,All Day,
+Cayla (GC),16UA,MD Heartbreakers 16U,7/10/2026,Fri,vs. USA Softball East Coast Showdown,,All Day,VA
+Claire (GC),16UA,Olney Cougars 16U Anderson,7/10/2026,Fri,vs. Summer Scorcher,,All Day,VA
+Noelle Jennings (9),16UB,Chesapeake Wave,7/10/2026,Fri,vs. TBD,,All Day,
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/11/2026,Sat,vs. USA Softball East Coast Showdown,,All Day,VA
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/11/2026,Sat,vs. USA Softball East Coast Showdown,,All Day,
+Cayla (GC),16UA,MD Heartbreakers 16U,7/11/2026,Sat,vs. USA Softball East Coast Showdown,,All Day,VA
+Claire (GC),16UA,Olney Cougars 16U Anderson,7/11/2026,Sat,vs. Summer Scorcher,,All Day,VA
+Emery Stup (7),12UA,Maryland Fever 12U Miller,7/11/2026,Sat,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/11/2026,Sat,vs. TBD,,9:00 AM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/11/2026,Sat,vs. TBD,,1:00 PM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/11/2026,Sat,vs. TBD,,5:00 PM,
+Noelle Jennings (9),16UB,Chesapeake Wave,7/11/2026,Sat,vs. TBD,,All Day,
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,7/11/2026,Sat,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
+Stella (GC),16UB,Lady Jackets 16B,7/11/2026,Sat,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/12/2026,Sun,vs. USA Softball East Coast Showdown,,All Day,VA
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/12/2026,Sun,vs. USA Softball East Coast Showdown,,All Day,
+Cayla (GC),16UA,MD Heartbreakers 16U,7/12/2026,Sun,vs. USA Softball East Coast Showdown,,All Day,VA
+Claire (GC),16UA,Olney Cougars 16U Anderson,7/12/2026,Sun,vs. Summer Scorcher,,All Day,VA
+Emery Stup (7),12UA,Maryland Fever 12U Miller,7/12/2026,Sun,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/12/2026,Sun,vs. TBD,,9:00 AM,
+Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,7/12/2026,Sun,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
+Stella (GC),16UB,Lady Jackets 16B,7/12/2026,Sun,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/14/2026,Tue,vs. USSSA Eastern National Championship,,All Day,
+Ashley (GC),14UB,Lady Jackets 14B,7/15/2026,Wed,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/15/2026,Wed,vs. USSSA Eastern National Championship,,All Day,
+Cayla (GC),16UA,MD Heartbreakers 16U,7/15/2026,Wed,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Claire (GC),16UA,Olney Cougars 16U Anderson,7/15/2026,Wed,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Emma Chavez (8),13UA,Maryland InteGRITy 13U,7/15/2026,Wed,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Sophia (GC),14UB,Green Wave 14U,7/15/2026,Wed,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Ashley (GC),14UB,Lady Jackets 14B,7/16/2026,Thu,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/16/2026,Thu,vs. USSSA Eastern National Championship,,All Day,
+Cayla (GC),16UA,MD Heartbreakers 16U,7/16/2026,Thu,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Claire (GC),16UA,Olney Cougars 16U Anderson,7/16/2026,Thu,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Emma Chavez (8),13UA,Maryland InteGRITy 13U,7/16/2026,Thu,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Sophia (GC),14UB,Green Wave 14U,7/16/2026,Thu,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Ashley (GC),14UB,Lady Jackets 14B,7/17/2026,Fri,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/17/2026,Fri,vs. USSSA Eastern National Championship,,All Day,
+Cayla (GC),16UA,MD Heartbreakers 16U,7/17/2026,Fri,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Claire (GC),16UA,Olney Cougars 16U Anderson,7/17/2026,Fri,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Emma Chavez (8),13UA,Maryland InteGRITy 13U,7/17/2026,Fri,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Noelle Jennings (9),16UB,Chesapeake Wave,7/17/2026,Fri,vs. TBD,,All Day,
+Sophia (GC),14UB,Green Wave 14U,7/17/2026,Fri,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Ashley (GC),14UB,Lady Jackets 14B,7/18/2026,Sat,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/18/2026,Sat,vs. INDEPENDENCE COLLEGE SHOWCASE,,All Day,MD
+Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/18/2026,Sat,vs. USSSA Eastern National Championship,,All Day,
+Cayla (GC),16UA,MD Heartbreakers 16U,7/18/2026,Sat,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Claire (GC),16UA,Olney Cougars 16U Anderson,7/18/2026,Sat,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Emma Chavez (8),13UA,Maryland InteGRITy 13U,7/18/2026,Sat,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,7/18/2026,Sat,vs. INDEPENDENCE COLLEGE SHOWCASE,,All Day,MD
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/18/2026,Sat,vs. TBD,,8:00 AM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/18/2026,Sat,vs. TBD,,1:00 PM,
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/18/2026,Sat,vs. TBD,,5:00 PM,
+Noelle Jennings (9),16UB,Chesapeake Wave,7/18/2026,Sat,vs. Independence College Showcase,,All Day,MD
+Sophia (GC),14UB,Green Wave 14U,7/18/2026,Sat,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Stella (GC),16UB,Lady Jackets 16B,7/18/2026,Sat,vs. INDEPENDENCE COLLEGE SHOWCASE,,All Day,MD
+Ashley (GC),14UB,Lady Jackets 14B,7/19/2026,Sun,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/19/2026,Sun,vs. INDEPENDENCE COLLEGE SHOWCASE,,All Day,MD
+Cayla (GC),16UA,MD Heartbreakers 16U,7/19/2026,Sun,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Claire (GC),16UA,Olney Cougars 16U Anderson,7/19/2026,Sun,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Emma Chavez (8),13UA,Maryland InteGRITy 13U,7/19/2026,Sun,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,7/19/2026,Sun,vs. INDEPENDENCE COLLEGE SHOWCASE,,All Day,MD
+Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/19/2026,Sun,vs. TBD,,8:00 AM,
+Noelle Jennings (9),16UB,Chesapeake Wave,7/19/2026,Sun,vs. Independence College Showcase,,All Day,MD
+Sophia (GC),14UB,Green Wave 14U,7/19/2026,Sun,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
+Stella (GC),16UB,Lady Jackets 16B,7/19/2026,Sun,vs. INDEPENDENCE COLLEGE SHOWCASE,,All Day,MD
+Noelle Jennings (9),16UB,Chesapeake Wave,7/21/2026,Tue,vs. TBD,,All Day,
+Noelle Jennings (9),16UB,Chesapeake Wave,7/22/2026,Wed,vs. TBD,,All Day,
+Noelle Jennings (9),16UB,Chesapeake Wave,7/23/2026,Thu,vs. TBD,,All Day,
+Noelle Jennings (9),16UB,Chesapeake Wave,7/24/2026,Fri,vs. TBD,,All Day,
+Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,7/25/2026,Sat,vs. 2026 East Coast Showdown,,All Day,NC
+Noelle Jennings (9),16UB,Chesapeake Wave,7/25/2026,Sat,vs. TBD,,All Day,
+Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,7/26/2026,Sun,vs. 2026 East Coast Showdown,,All Day,NC`;
+</script>
+
+<!-- ===== APP LOGIC ===== -->
+<script>
+// ---------- CONFIG ----------
+const PLAYER_COLORS = [
+  {bg:'#dbeafe',text:'#1e40af',dot:'#3b82f6'},   // blue
+  {bg:'#dcfce7',text:'#166534',dot:'#16a34a'},   // green
+  {bg:'#fef3c7',text:'#92400e',dot:'#d97706'},   // amber
+  {bg:'#f3e8ff',text:'#6b21a8',dot:'#9333ea'},   // purple
+  {bg:'#fce7f3',text:'#9d174d',dot:'#ec4899'},   // pink
+  {bg:'#ffedd5',text:'#7c2d12',dot:'#ea580c'},   // orange
+  {bg:'#ccfbf1',text:'#134e4a',dot:'#0d9488'},   // teal
+  {bg:'#e0e7ff',text:'#312e81',dot:'#6366f1'},   // indigo
+  {bg:'#fef2f2',text:'#7f1d1d',dot:'#ef4444'},   // red
+  {bg:'#ecfdf5',text:'#14532d',dot:'#22c55e'},   // emerald
+  {bg:'#fff7ed',text:'#7c2d12',dot:'#f97316'},   // light orange
+  {bg:'#eff6ff',text:'#1e3a8a',dot:'#2563eb'},   // light blue
+];
+
+let allData = [];
+let filteredData = [];
+let colorMap = {};
+let colorIdx = 0;
+let activePlayers = new Set();
+let sortDir = 1; // 1=asc, -1=desc
+let chatOpen = false;
+let chatHistory = [];
+let usingLiveData = false;
+
+// ---------- INIT ----------
+async function init() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('date-from').value = today;
+
+  try {
+    const resp = await fetch(SHEETS_URL, { signal: AbortSignal.timeout(5000) });
+    const text = await resp.text();
+    if (!text.trimStart().startsWith('<') && text.includes(',')) {
+      allData = parseCSV(text);
+      usingLiveData = true;
+    } else { throw new Error('not csv'); }
+  } catch(e) {
+    allData = parseCSV(EMBEDDED_CSV);
+  }
+
+  allData = allData.filter(r => r.Player || r['Player Name']);
+  // normalize "Player Name" -> "Player"
+  allData = allData.map(r => {
+    if (!r.Player && r['Player Name']) r.Player = r['Player Name'];
+    return r;
+  }).filter(r => r.Player && r.Date);
+
+  setBadge();
+  buildColorMap();
+  buildPlayerFilters();
+  applyFilters();
+  document.getElementById('loading-msg').classList.add('hidden');
+  document.getElementById('table-wrap').classList.remove('hidden');
+  document.getElementById('date-from').addEventListener('change', applyFilters);
+  document.getElementById('date-to').addEventListener('change', applyFilters);
+}
+
+function setBadge() {
+  const badge = document.getElementById('data-badge');
+  if (usingLiveData) {
+    badge.textContent = '🔴 Live (Google Sheets)';
+    badge.className = 'text-xs px-2 py-1 rounded-full bg-green-700 text-green-100';
+  } else {
+    badge.textContent = '📦 Embedded data';
+    badge.className = 'text-xs px-2 py-1 rounded-full bg-blue-800 text-blue-200 border border-blue-700';
+  }
+}
+
+// ---------- CSV / DATA ----------
+function parseCSV(text) {
+  const result = Papa.parse(text.trim(), { header: true, skipEmptyLines: true });
+  return result.data;
+}
+
+function getIndividualPlayers(playerCell) {
+  if (!playerCell) return [];
+  return playerCell.split(';').map(s => s.trim()).filter(Boolean);
+}
+
+function buildColorMap() {
+  // Assign a color per unique "player group" (as they appear in data)
+  const groups = [...new Set(allData.map(r => r.Player).filter(Boolean))];
+  groups.forEach(g => {
+    if (!colorMap[g]) {
+      colorMap[g] = PLAYER_COLORS[colorIdx % PLAYER_COLORS.length];
+      colorIdx++;
+    }
+  });
+}
+
+function dateToISOStr(dateStr) {
+  // e.g. "5/23/2026" -> "2026-05-23"
+  if (!dateStr) return '';
+  const p = dateStr.split('/');
+  if (p.length !== 3) return dateStr;
+  return `${p[2]}-${p[0].padStart(2,'0')}-${p[1].padStart(2,'0')}`;
+}
+
+function formatDateDisplay(dateStr, dayStr) {
+  if (!dateStr) return '';
+  const iso = dateToISOStr(dateStr);
+  const d = new Date(iso + 'T12:00:00');
+  if (isNaN(d)) return dateStr;
+  const mon = d.toLocaleString('en-US', {month:'short'});
+  const dayNum = d.getDate();
+  return `<span class="font-semibold">${dayStr || ''}</span> <span class="text-gray-600">${mon} ${dayNum}</span>`;
+}
+
+// ---------- FILTERS ----------
+function buildPlayerFilters() {
+  const container = document.getElementById('player-filters');
+  container.innerHTML = '';
+  const individuals = new Set();
+  allData.forEach(r => getIndividualPlayers(r.Player).forEach(p => individuals.add(p)));
+  const sorted = [...individuals].sort();
+  sorted.forEach(player => {
+    // Find the group this player belongs to for color
+    const group = allData.find(r => getIndividualPlayers(r.Player).includes(player))?.Player || player;
+    const c = colorMap[group] || PLAYER_COLORS[0];
+    const btn = document.createElement('button');
+    btn.dataset.player = player;
+    btn.className = 'player-filter-btn text-xs px-2 py-0.5 rounded-full border transition-all';
+    btn.style.cssText = `background:${c.bg};color:${c.text};border-color:${c.dot};`;
+    btn.textContent = player;
+    btn.onclick = () => togglePlayerFilter(player, btn);
+    container.appendChild(btn);
+  });
+}
+
+function togglePlayerFilter(player, btn) {
+  if (activePlayers.has(player)) {
+    activePlayers.delete(player);
+    btn.style.opacity = '1';
+    btn.style.boxShadow = '';
+    btn.style.fontWeight = '';
+  } else {
+    activePlayers.add(player);
+    btn.style.opacity = '1';
+    btn.style.boxShadow = '0 0 0 2px currentColor';
+    btn.style.fontWeight = '700';
+  }
+  applyFilters();
+}
+
+function clearPlayerFilter() {
+  activePlayers.clear();
+  document.querySelectorAll('.player-filter-btn').forEach(b => {
+    b.style.boxShadow = '';
+    b.style.fontWeight = '';
+  });
+  applyFilters();
+}
+
+function clearDateFilter() {
+  document.getElementById('date-from').value = '';
+  document.getElementById('date-to').value = '';
+  applyFilters();
+}
+
+function applyFilters() {
+  const fromVal = document.getElementById('date-from').value; // YYYY-MM-DD
+  const toVal = document.getElementById('date-to').value;
+
+  filteredData = allData.filter(row => {
+    const iso = dateToISOStr(row.Date);
+    if (fromVal && iso < fromVal) return false;
+    if (toVal && iso > toVal) return false;
+    if (activePlayers.size > 0) {
+      const players = getIndividualPlayers(row.Player);
+      if (!players.some(p => activePlayers.has(p))) return false;
+    }
+    return true;
+  });
+
+  // Sort by date asc by default
+  filteredData.sort((a,b) => {
+    const diff = dateToISOStr(a.Date).localeCompare(dateToISOStr(b.Date));
+    return diff * sortDir;
+  });
+
+  renderTable();
+}
+
+function sortBy(field) {
+  if (field === 'date') {
+    sortDir *= -1;
+    const icon = document.getElementById('sort-date');
+    icon.textContent = sortDir === 1 ? '↑' : '↓';
+    filteredData.sort((a,b) => dateToISOStr(a.Date).localeCompare(dateToISOStr(b.Date)) * sortDir);
+    renderTable();
+  }
+}
+
+// ---------- RENDER TABLE ----------
+function makeMapLink(location) {
+  if (!location) return '';
+  const query = encodeURIComponent(location);
+  return `<a href="https://www.google.com/maps/search/?api=1&query=${query}" target="_blank" rel="noopener" class="location-link" title="Open in Google Maps">📍 ${escHtml(location)}</a>`;
+}
+
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderTable() {
+  const tbody = document.getElementById('schedule-tbody');
+  const noResults = document.getElementById('no-results');
+  const rowCount = document.getElementById('row-count');
+
+  rowCount.textContent = filteredData.length + ' game' + (filteredData.length !== 1 ? 's' : '');
+
+  if (filteredData.length === 0) {
+    tbody.innerHTML = '';
+    noResults.classList.remove('hidden');
+    document.getElementById('table-wrap').classList.add('hidden');
+    return;
+  }
+
+  noResults.classList.add('hidden');
+  document.getElementById('table-wrap').classList.remove('hidden');
+
+  let lastDate = null;
+  const rows = filteredData.map((row, i) => {
+    const c = colorMap[row.Player] || PLAYER_COLORS[0];
+    const isNewDate = row.Date !== lastDate;
+    lastDate = row.Date;
+    const borderTop = isNewDate && i > 0 ? 'border-t-2 border-gray-200' : '';
+
+    const locHtml = row.Location ? makeMapLink(row.Location) : '<span class="text-gray-400 text-xs">—</span>';
+    const timeHtml = row.Time ? `<span class="font-mono text-xs">${escHtml(row.Time)}</span>` : '<span class="text-gray-400 text-xs">—</span>';
+    const haDir = row['Home/Away'] ? `<span class="text-xs text-gray-400 ml-1">${row['Home/Away']==='Home'?'🏠':'✈️'}</span>` : '';
+
+    const playerChips = getIndividualPlayers(row.Player).map(p => {
+      const gc = allData.find(r => getIndividualPlayers(r.Player).includes(p))?.Player || p;
+      const pc = colorMap[gc] || PLAYER_COLORS[0];
+      return `<span class="inline-block text-xs px-1.5 py-0.5 rounded-full font-medium mr-0.5" style="background:${pc.bg};color:${pc.text};">${escHtml(p)}</span>`;
+    }).join('');
+
+    return `<tr class="${borderTop} hover:bg-yellow-50 transition-colors">
+      <td class="px-3 py-2 whitespace-nowrap text-xs" style="border-left:3px solid ${c.dot}">${formatDateDisplay(row.Date, row.Day)}</td>
+      <td class="px-3 py-2">${playerChips}</td>
+      <td class="px-3 py-2 text-xs"><span class="text-gray-500">${escHtml(row.Division||'')}</span><br><span class="font-medium text-gray-800">${escHtml(row.Team||'')}</span></td>
+      <td class="px-3 py-2 text-xs font-medium text-gray-800">${escHtml(row.Opponent||'')}${haDir}</td>
+      <td class="px-3 py-2 whitespace-nowrap">${timeHtml}</td>
+      <td class="px-3 py-2 text-xs">${locHtml}</td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = rows.join('');
+}
+
+// ---------- CHAT ----------
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const panel = document.getElementById('chat-panel');
+  const icon = document.getElementById('chat-toggle-icon');
+  const msgs = document.getElementById('chat-messages');
+  const examples = document.getElementById('chat-examples');
+  const inputRow = document.getElementById('chat-input-row');
+
+  if (chatOpen) {
+    panel.classList.remove('collapsed');
+    icon.textContent = '▼';
+    msgs.classList.remove('hidden');
+    examples.classList.remove('hidden');
+    inputRow.classList.remove('hidden');
+    setTimeout(() => document.getElementById('chat-input')?.focus(), 50);
+  } else {
+    panel.classList.add('collapsed');
+    icon.textContent = '▲';
+    msgs.classList.add('hidden');
+    examples.classList.add('hidden');
+    inputRow.classList.add('hidden');
+  }
+}
+
+function exampleQ(btn) {
+  document.getElementById('chat-input').value = btn.textContent;
+  sendQuestion();
+}
+
+async function sendQuestion() {
+  const input = document.getElementById('chat-input');
+  const question = input.value.trim();
+  if (!question) return;
+  input.value = '';
+
+  appendMessage('user', question);
+  setThinking(true);
+
+  const today = new Date().toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+  try {
+    const resp = await fetch('/api/ask', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        question,
+        scheduleCSV: EMBEDDED_CSV,
+        today
+      })
+    });
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    appendMessage('assistant', data.answer);
+  } catch(e) {
+    appendMessage('assistant', `⚠️ Error: ${e.message}. Make sure the Vercel function is deployed with ANTHROPIC_API_KEY set.`);
+  } finally {
+    setThinking(false);
+  }
+}
+
+function setThinking(on) {
+  document.getElementById('chat-thinking').classList.toggle('hidden', !on);
+  const btn = document.querySelector('#chat-input-row button');
+  if (btn) btn.disabled = on;
+}
+
+function appendMessage(role, text) {
+  const msgs = document.getElementById('chat-messages');
+  const isUser = role === 'user';
+
+  const div = document.createElement('div');
+  div.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+
+  const bubble = document.createElement('div');
+  bubble.className = isUser
+    ? 'bg-blue-700 text-white rounded-2xl rounded-br-sm px-3 py-2 max-w-lg text-sm'
+    : 'bg-gray-100 text-gray-800 rounded-2xl rounded-bl-sm px-3 py-2 max-w-2xl text-sm prose';
+
+  if (isUser) {
+    bubble.textContent = text;
+  } else {
+    bubble.innerHTML = marked.parse(text);
+  }
+
+  div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ---------- START ----------
+init();
+</script>
+</body>
+</html>

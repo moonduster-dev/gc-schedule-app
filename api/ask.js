@@ -51,12 +51,16 @@ ${scheduleCSV || "No schedule data available."}
 
 Answer questions about player schedules, team names, team URLs, locations, and tournament information. Be concise and use bullet points or tables where helpful. For games, always include date, day, time, opponent, and location when available. Format dates as "Mon May 23" style.`;
 
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages: [{ role: "user", content: question }],
-  });
-
-  res.json({ answer: message.content[0].text });
+  try {
+    const message = await client.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: [{ role: "user", content: question }],
+    });
+    res.json({ answer: message.content[0].text });
+  } catch (e) {
+    console.error("Anthropic API error:", e);
+    res.status(500).json({ error: e.message || "API call failed" });
+  }
 }

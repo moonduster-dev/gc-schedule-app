@@ -11,9 +11,8 @@
     html { height: 100%; }
     body { height: 100%; display: flex; flex-direction: column; font-family: system-ui, sans-serif; }
     #main-area { flex: 1; overflow: auto; }
-    #chat-panel { max-height: 420px; transition: max-height .3s ease; }
-    #chat-panel.collapsed { max-height: 52px; }
-    #chat-messages { overflow-y: auto; max-height: 280px; }
+    #chat-panel { border-bottom: 1px solid #e5e7eb; }
+    #chat-messages { overflow-y: auto; max-height: 240px; }
     .prose table { width: 100%; border-collapse: collapse; }
     .prose table td, .prose table th { border: 1px solid #e5e7eb; padding: 4px 8px; text-align: left; }
     .prose ul { padding-left: 1.25rem; list-style-type: disc; }
@@ -60,6 +59,39 @@
   </div>
 </div>
 
+<!-- ===== CHAT PANEL (top) ===== -->
+<div id="chat-panel" class="bg-white flex-shrink-0 flex flex-col">
+
+  <!-- Message history (hidden until first answer) -->
+  <div id="chat-messages-wrap" class="hidden">
+    <div class="flex items-center px-4 py-1 bg-gray-50 border-b border-gray-100 cursor-pointer select-none" onclick="toggleChatHistory()">
+      <svg class="w-3.5 h-3.5 text-gray-400 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3-3-3z"/></svg>
+      <span class="text-xs text-gray-500 font-medium">Conversation</span>
+      <span id="chat-toggle-icon" class="ml-auto text-xs text-gray-400">▲ hide</span>
+    </div>
+    <div id="chat-messages" class="px-4 py-2 space-y-2 bg-gray-50"></div>
+  </div>
+
+  <!-- Example chips -->
+  <div id="chat-examples" class="px-4 py-1.5 flex flex-wrap gap-1.5 border-b border-gray-100">
+    <span class="text-xs text-gray-400 self-center">Try:</span>
+    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">When does Sophia play next?</button>
+    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">What games are this weekend?</button>
+    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">Who plays on July 11?</button>
+    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">What teams play at nationals?</button>
+    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">GameChanger URL for Lady Jackets 16B?</button>
+  </div>
+
+  <!-- Always-visible input row -->
+  <div class="px-3 py-2 flex gap-2 items-center">
+    <input id="chat-input" type="text" placeholder="Ask about players, schedules, teams, or locations…"
+      class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+      onkeydown="if(event.key==='Enter')sendQuestion()">
+    <button onclick="sendQuestion()" class="bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition">Ask</button>
+    <span id="chat-thinking" class="hidden"><span class="spinner"></span></span>
+  </div>
+</div>
+
 <!-- ===== MAIN SCHEDULE TABLE ===== -->
 <div id="main-area" class="p-3">
   <div id="loading-msg" class="text-center text-gray-400 py-10">Loading schedule…</div>
@@ -81,38 +113,6 @@
   <p id="no-results" class="hidden text-center text-gray-400 py-10">No games match the current filters.</p>
 </div>
 
-<!-- ===== CHAT PANEL ===== -->
-<div id="chat-panel" class="bg-white border-t border-gray-200 shadow-2xl flex-shrink-0 collapsed flex flex-col">
-  <!-- Chat Header / Toggle -->
-  <div class="flex items-center gap-2 px-4 py-2.5 border-b border-gray-100 cursor-pointer select-none" onclick="toggleChat()">
-    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3-3-3z"/></svg>
-    <span class="text-sm font-semibold text-gray-700">Ask a question about the schedule</span>
-    <span id="chat-toggle-icon" class="ml-auto text-gray-400 text-lg leading-none">▲</span>
-    <span id="chat-thinking" class="hidden ml-2"><span class="spinner"></span></span>
-  </div>
-
-  <!-- Messages -->
-  <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-2 space-y-2 hidden"></div>
-
-  <!-- Examples row -->
-  <div id="chat-examples" class="px-4 py-1 flex flex-wrap gap-1.5 hidden">
-    <span class="text-xs text-gray-500 mr-1 self-center">Try:</span>
-    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">When does Sophia play next?</button>
-    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">What games are this weekend?</button>
-    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">Who plays on July 11?</button>
-    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">Show MD Crush National 18U schedule</button>
-    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">What teams play at nationals?</button>
-    <button onclick="exampleQ(this)" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-full px-2.5 py-0.5">GameChanger URL for Lady Jackets 16B?</button>
-  </div>
-
-  <!-- Input row -->
-  <div class="hidden px-3 py-2.5 border-t border-gray-100 flex gap-2" id="chat-input-row">
-    <input id="chat-input" type="text" placeholder="Ask about players, schedules, teams, or locations…"
-      class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-      onkeydown="if(event.key==='Enter')sendQuestion()">
-    <button onclick="sendQuestion()" class="bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition">Ask</button>
-  </div>
-</div>
 
 <!-- ===== DATA ===== -->
 <script>
@@ -467,14 +467,35 @@ function formatDateDisplay(dateStr, dayStr) {
 }
 
 // ---------- FILTERS ----------
+function getPlayerGrade(name) {
+  const m = name.match(/\((GC|\d+)\)\s*$/);
+  return m ? m[1] : 'other';
+}
+function gradeOrder(g) {
+  return g === 'GC' ? 0 : g === '9' ? 1 : g === '8' ? 2 : g === '7' ? 3 : 99;
+}
+
 function buildPlayerFilters() {
   const container = document.getElementById('player-filters');
   container.innerHTML = '';
   const individuals = new Set();
   allData.forEach(r => getIndividualPlayers(r.Player).forEach(p => individuals.add(p)));
-  const sorted = [...individuals].sort();
+
+  const sorted = [...individuals].sort((a, b) => {
+    const diff = gradeOrder(getPlayerGrade(a)) - gradeOrder(getPlayerGrade(b));
+    return diff !== 0 ? diff : a.localeCompare(b);
+  });
+
+  let currentGrade = null;
   sorted.forEach(player => {
-    // Find the group this player belongs to for color
+    const grade = getPlayerGrade(player);
+    if (grade !== currentGrade) {
+      currentGrade = grade;
+      const label = document.createElement('span');
+      label.className = 'text-xs font-bold text-gray-400 uppercase tracking-wider self-center mx-1';
+      label.textContent = grade === 'GC' ? 'GC' : `Grade ${grade}`;
+      container.appendChild(label);
+    }
     const group = allData.find(r => getIndividualPlayers(r.Player).includes(player))?.Player || player;
     const c = colorMap[group] || PLAYER_COLORS[0];
     const btn = document.createElement('button');
@@ -610,28 +631,14 @@ function renderTable() {
 }
 
 // ---------- CHAT ----------
-function toggleChat() {
-  chatOpen = !chatOpen;
-  const panel = document.getElementById('chat-panel');
-  const icon = document.getElementById('chat-toggle-icon');
-  const msgs = document.getElementById('chat-messages');
-  const examples = document.getElementById('chat-examples');
-  const inputRow = document.getElementById('chat-input-row');
+let historyVisible = true;
 
-  if (chatOpen) {
-    panel.classList.remove('collapsed');
-    icon.textContent = '▼';
-    msgs.classList.remove('hidden');
-    examples.classList.remove('hidden');
-    inputRow.classList.remove('hidden');
-    setTimeout(() => document.getElementById('chat-input')?.focus(), 50);
-  } else {
-    panel.classList.add('collapsed');
-    icon.textContent = '▲';
-    msgs.classList.add('hidden');
-    examples.classList.add('hidden');
-    inputRow.classList.add('hidden');
-  }
+function toggleChatHistory() {
+  historyVisible = !historyVisible;
+  const msgs = document.getElementById('chat-messages');
+  const icon = document.getElementById('chat-toggle-icon');
+  msgs.style.display = historyVisible ? '' : 'none';
+  icon.textContent = historyVisible ? '▲ hide' : '▼ show';
 }
 
 function exampleQ(btn) {
@@ -673,13 +680,17 @@ async function sendQuestion() {
 
 function setThinking(on) {
   document.getElementById('chat-thinking').classList.toggle('hidden', !on);
-  const btn = document.querySelector('#chat-input-row button');
+  const btn = document.querySelector('#chat-panel button[onclick="sendQuestion()"]');
   if (btn) btn.disabled = on;
 }
 
 function appendMessage(role, text) {
+  const wrap = document.getElementById('chat-messages-wrap');
   const msgs = document.getElementById('chat-messages');
   const isUser = role === 'user';
+
+  // Show the history panel on first message
+  wrap.classList.remove('hidden');
 
   const div = document.createElement('div');
   div.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
@@ -687,7 +698,7 @@ function appendMessage(role, text) {
   const bubble = document.createElement('div');
   bubble.className = isUser
     ? 'bg-blue-700 text-white rounded-2xl rounded-br-sm px-3 py-2 max-w-lg text-sm'
-    : 'bg-gray-100 text-gray-800 rounded-2xl rounded-bl-sm px-3 py-2 max-w-2xl text-sm prose';
+    : 'bg-white border border-gray-200 text-gray-800 rounded-2xl rounded-bl-sm px-3 py-2 max-w-2xl text-sm prose shadow-sm';
 
   if (isUser) {
     bubble.textContent = text;

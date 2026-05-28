@@ -22,7 +22,7 @@ Green Wave 14U: GC=Jywdg65LyJ9d, USSSA=3278942
 Lady Jackets 14B: GC=aFqm2RprbzeI, USSSA=3286889
 Lady Jackets 16B: GC=cMBx3VMn1ljb, USSSA=3294634
 MD Heartbreakers 16U: GC=Ysu91toVIK1i
-Olney Cougars 16U Anderson: GC=AcRaRViqzzW4, USSSA=3293685
+Olney Cougars 16U Anderson: GC=MJYrInciK5re, USSSA=3293685
 Olney Cougars 18U: GC=c2j8wp78F4E3, USSSA=3292730
 BCC Flash: GC=XKNsbMzlZFCT, USSSA=3288976
 Freedom Firebirds-Petry: GC=UzNkT3EtT07X, USSSA=3291417

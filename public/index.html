@@ -27,6 +27,8 @@
     .spinner { border: 3px solid #e5e7eb; border-top-color: #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin .7s linear infinite; display:inline-block; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .row-highlight { background-color: #fef9c3 !important; }
+    .row-matchup { background-color: #f0fdf4 !important; }
+    .row-matchup td:first-child { border-left-color: #16a34a !important; }
     @media (max-width: 640px) {
       #schedule-table { font-size: 0.8rem; }
       #schedule-table th, #schedule-table td { padding: 0.4rem 0.5rem; }
@@ -383,6 +385,7 @@ let sortDir = 1; // 1=asc, -1=desc
 let chatOpen = false;
 let chatHistory = [];
 let usingLiveData = false;
+let teamsByDate = {};
 
 // ---------- INIT ----------
 async function init() {
@@ -409,6 +412,7 @@ async function init() {
 
   setBadge();
   buildColorMap();
+  buildTeamsByDate();
   buildPlayerFilters();
   applyFilters();
   document.getElementById('loading-msg').classList.add('hidden');
@@ -437,6 +441,28 @@ function parseCSV(text) {
 function getIndividualPlayers(playerCell) {
   if (!playerCell) return [];
   return playerCell.split(';').map(s => s.trim()).filter(Boolean);
+}
+
+function buildTeamsByDate() {
+  teamsByDate = {};
+  allData.forEach(r => {
+    const d = r.Date;
+    const t = (r.Team || '').toLowerCase().trim();
+    if (d && t) {
+      if (!teamsByDate[d]) teamsByDate[d] = new Set();
+      teamsByDate[d].add(t);
+    }
+  });
+}
+
+function isHeadToHead(row) {
+  const myTeam = (row.Team || '').toLowerCase().trim();
+  const opp = (row.Opponent || '').toLowerCase();
+  const teams = teamsByDate[row.Date] || new Set();
+  for (const team of teams) {
+    if (team && team !== myTeam && opp.includes(team)) return true;
+  }
+  return false;
 }
 
 function buildColorMap() {
@@ -608,6 +634,7 @@ function renderTable() {
     const isNewDate = row.Date !== lastDate;
     lastDate = row.Date;
     const borderTop = isNewDate && i > 0 ? 'border-t-2 border-gray-200' : '';
+    const matchup = isHeadToHead(row);
 
     const locHtml = row.Location ? makeMapLink(row.Location) : '<span class="text-gray-400">—</span>';
     const timeHtml = row.Time ? `<span class="font-mono">${escHtml(row.Time)}</span>` : '<span class="text-gray-400">—</span>';
@@ -619,11 +646,11 @@ function renderTable() {
       return `<span class="inline-block text-sm px-2 py-0.5 rounded-full font-medium mr-0.5 mb-0.5" style="background:${pc.bg};color:${pc.text};">${escHtml(p)}</span>`;
     }).join('');
 
-    return `<tr class="${borderTop} hover:bg-yellow-50 transition-colors">
+    return `<tr class="${borderTop} ${matchup ? 'row-matchup' : 'hover:bg-yellow-50'} transition-colors">
       <td class="px-4 py-3 whitespace-nowrap" style="border-left:3px solid ${c.dot}">${formatDateDisplay(row.Date, row.Day)}</td>
       <td class="px-4 py-3" style="max-width:160px">${playerChips}</td>
       <td class="px-4 py-3 col-division"><span class="text-gray-500 text-sm">${escHtml(row.Division||'')}</span><br><span class="font-medium text-gray-800">${escHtml(row.Team||'')}</span></td>
-      <td class="px-4 py-3 font-medium text-gray-800">${escHtml(row.Opponent||'')}${haDir}</td>
+      <td class="px-4 py-3 font-medium text-gray-800">${escHtml(row.Opponent||'')}${haDir}${matchup ? ' <span class="text-green-600 font-bold ml-1" title="GC players on both teams!">⚔️</span>' : ''}</td>
       <td class="px-4 py-3 whitespace-nowrap">${timeHtml}</td>
       <td class="px-4 py-3 col-location">${locHtml}</td>
     </tr>`;
@@ -706,6 +733,15 @@ function appendMessage(role, text) {
     bubble.textContent = text;
   } else {
     bubble.innerHTML = marked.parse(text);
+    const printBtn = document.createElement('button');
+    printBtn.textContent = '🖨️ print';
+    printBtn.className = 'block text-xs text-gray-400 hover:text-gray-600 mt-1 pt-1 border-t border-gray-100 w-full text-right';
+    printBtn.onclick = () => {
+      const w = window.open('', '_blank', 'width=700,height=600');
+      w.document.write('<!DOCTYPE html><html><head><title>Schedule Answer</title><style>body{font-family:system-ui,sans-serif;padding:24px;max-width:650px;}table{border-collapse:collapse;width:100%;}td,th{border:1px solid #ccc;padding:4px 8px;text-align:left;}ul{padding-left:1.25rem;}p{margin:.4rem 0;}</style></head><body>' + marked.parse(text) + '<script>window.onload=()=>{window.print();}<\/script></body></html>');
+      w.document.close();
+    };
+    bubble.appendChild(printBtn);
   }
 
   div.appendChild(bubble);

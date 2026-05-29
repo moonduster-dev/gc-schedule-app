@@ -123,12 +123,15 @@
 const SHEETS_URL = '/api/schedule';
 
 const EMBEDDED_CSV = `Player,Division,Team,Date,Day,Opponent,Home/Away,Time,Location
-Stella (GC),16UB,Lady Jackets 16B,5/28/2026,Thu,vs. Mvsa Storm 18U,Home,6:30 PM,
 Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/30/2026,Sat,vs. Maryland Patriots,,9:00 AM,River Hill High School - Varsity
 Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/30/2026,Sat,vs. Lady Senators 16u - Evans,,12:00 PM,River Hill High School - Varsity
 Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/30/2026,Sat,vs. Maryland Fever 2009,,3:00 PM,River Hill High School - Varsity
 Autumn (GC),16UC,Shockwaves 16U,5/30/2026,Sat,vs. LT Lazers White,,2:40 PM,Fairland Regional Park - Field 3
 Autumn (GC),16UC,Shockwaves 16U,5/30/2026,Sat,vs. STARS Shine 16U,,4:05 PM,Fairland Regional Park - Field 3
+Avery Brindley (7),12UA,LLG Uprising 12U,5/30/2026,Sat,vs. NC Challengers - Galligan Spring '26,,9:00 AM,
+Avery Brindley (7),12UA,LLG Uprising 12U,5/30/2026,Sat,vs. Unity Niles 12U,,10:30 AM,
+Avery Brindley (7),12UA,LLG Uprising 12U,5/30/2026,Sat,vs. Dirtbags Coastal 12U,,3:00 PM,
+Avery Brindley (7),12UA,LLG Uprising 12U,5/30/2026,Sat,vs. Team NC Walden 12U,,4:30 PM,
 Cayla (GC),16UA,MD Heartbreakers 16U,5/30/2026,Sat,vs. Bayside Blues,,9:00 AM,Marriotts Ridge High School - Varsity
 Cayla (GC),16UA,MD Heartbreakers 16U,5/30/2026,Sat,vs. Freedom Firebirds 16u,,12:00 PM,Marriotts Ridge High School - Junior Varsity
 Cayla (GC),16UA,MD Heartbreakers 16U,5/30/2026,Sat,vs. Northern Calvert Fury 16U - Hall,,3:00 PM,Marriotts Ridge High School - Junior Varsity
@@ -175,6 +178,7 @@ Aleida Kerkhoven (7),11UC,Shockwaves 11U,5/31/2026,Sun,@ Maryland Fever 12U John
 Ashley (GC),14UB,Lady Jackets 14B,5/31/2026,Sun,vs. Rise Up 2030,,12:00 PM,
 Ashley (GC),14UB,Lady Jackets 14B,5/31/2026,Sun,vs. Rise Up 2030,,1:30 PM,
 Aubrey (GC),16UA,MD Stars Fastpitch 2029,5/31/2026,Sun,vs. Fever Frenzy - USA Eastern National Qualifier,,All Day,MD
+Avery Brindley (7),12UA,LLG Uprising 12U,5/31/2026,Sun,vs. Firecrackers Carbone 12U,,9:00 AM,
 Cayla (GC),16UA,MD Heartbreakers 16U,5/31/2026,Sun,vs. Fever Frenzy - USA Eastern National Qualifier,,All Day,MD
 Claire (GC),16UA,Olney Cougars 16U Anderson,5/31/2026,Sun,vs. Fever Frenzy - USA Eastern National Qualifier,,All Day,MD
 Emery Stup (7),12UA,Maryland Fever 12U Miller,5/31/2026,Sun,vs. Fever Frenzy - USA Eastern National Qualifier,,All Day,MD
@@ -187,13 +191,11 @@ Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,5/31/2026,
 Stella (GC),16UB,Lady Jackets 16B,5/31/2026,Sun,vs. STARS Goss 16U,,2:00 PM,
 Stella (GC),16UB,Lady Jackets 16B,5/31/2026,Sun,vs. STARS Goss 16U,,4:00 PM,
 Emery Stup (7),12UA,Maryland Fever 12U Miller,6/4/2026,Thu,vs. Heartbreakers 12U,Home,6:30 PM,
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/5/2026,Fri,vs. USA Softball Summer Strikeout National Qualifier,,All Day,
 Ashley (GC),14UB,Lady Jackets 14B,6/6/2026,Sat,vs. DMV Dream 14U,,9:00 AM,Brooklyn Park Tenth Avenue - Field 2
 Ashley (GC),14UB,Lady Jackets 14B,6/6/2026,Sat,vs. Maryland InteGRITy 13U,,10:25 AM,Brooklyn Park Tenth Avenue - Field 1
 Ashley (GC),14UB,Lady Jackets 14B,6/6/2026,Sat,vs. Hot Shots - Hendricks 14U,,1:15 PM,Brooklyn Park Tenth Avenue - Field 2
 Autumn (GC),16UC,Shockwaves 16U,6/6/2026,Sat,vs. Monarchs - Clavell,,9:00 AM,North Laurel Park - Field 4
 Autumn (GC),16UC,Shockwaves 16U,6/6/2026,Sat,vs. Stewartstown Wolfpack,,10:25 AM,North Laurel Park - Field 4
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/6/2026,Sat,vs. USA Softball Summer Strikeout National Qualifier,,All Day,
 Cayla (GC),16UA,MD Heartbreakers 16U,6/6/2026,Sat,vs. PA Mystics Gold 16U,,1:30 PM,
 Cayla (GC),16UA,MD Heartbreakers 16U,6/6/2026,Sat,vs. Unity Blackwell/Sowa 16U,,3:20 PM,
 Cayla (GC),16UA,MD Heartbreakers 16U,6/6/2026,Sat,vs. Lady Nightmares 16U,,5:10 PM,
@@ -234,11 +236,7 @@ Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,6/7/2026,S
 Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,6/7/2026,Sun,vs. Summer Strikeout (National Qualifier),,All Day,VA
 Sophia (GC),14UB,Green Wave 14U,6/7/2026,Sun,vs. Summer Strikeout (National Qualifier),,All Day,VA
 Stella (GC),16UB,Lady Jackets 16B,6/7/2026,Sun,vs. QUEEN OF DIAMONDS,,All Day,MD
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/12/2026,Fri,vs. USA Softball VA State Championship,,All Day,
 Noelle Jennings (9),16UB,Chesapeake Wave,6/12/2026,Fri,vs. TBD,,All Day,
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/13/2026,Sat,vs. Virginia Valor 12U,,8:30 AM,Harry G. Daniel Park at Ironbridge - Field 06
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/13/2026,Sat,vs. LLG Marshall,,10:05 AM,Harry G. Daniel Park at Ironbridge - Field 06
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/13/2026,Sat,vs. Chesterfield HavoK 2014,,1:15 PM,Harry G. Daniel Park at Ironbridge - Field 05
 Cayla (GC),16UA,MD Heartbreakers 16U,6/13/2026,Sat,vs. GOVERNORS CUP FATHERS DAY BASH - 16u,,All Day,MD
 Charli Glass (7),11UB,Maryland InteGRITy 2014,6/13/2026,Sat,vs. TBD,,9:00 AM,
 MDR (GC),18UA,Olney Cougars 18U,6/13/2026,Sat,vs. GOVERNORS CUP FATHERS DAY BASH - 18u,,All Day,MD
@@ -251,17 +249,12 @@ MDR (GC),18UA,Olney Cougars 18U,6/14/2026,Sun,vs. GOVERNORS CUP FATHERS DAY BASH
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,6/14/2026,Sun,vs. TBD,,9:00 AM,
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,6/14/2026,Sun,vs. TBD,,3:00 PM,
 Noelle Jennings (9),16UB,Chesapeake Wave,6/14/2026,Sun,vs. Summer Fun Fest,,All Day,PA
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/18/2026,Thu,vs. PGF Super Select East Coast Championship,,All Day,
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/19/2026,Fri,vs. PGF Super Select East Coast Championship,,All Day,
 Charli Glass (7),11UB,Maryland InteGRITy 2014,6/19/2026,Fri,vs. TBD,,2:00 PM,
 Emma Zhao (8),13UB,Shockwaves 13U,6/19/2026,Fri,vs. Shockwaves Blue Roberts 12U,,6:30 PM,
 Noelle Jennings (9),16UB,Chesapeake Wave,6/19/2026,Fri,vs. TBD,,All Day,
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/20/2026,Sat,vs. PGF Super Select East Coast Championship,,All Day,
 Charli Glass (7),11UB,Maryland InteGRITy 2014,6/20/2026,Sat,vs. TBD,,9:00 AM,
 Noelle Jennings (9),16UB,Chesapeake Wave,6/20/2026,Sat,vs. TBD,,All Day,
 Charli Glass (7),11UB,Maryland InteGRITy 2014,6/21/2026,Sun,vs. TBD,,9:00 AM,
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/26/2026,Fri,vs. USA Softball Cherry Bomb Tournament,,All Day,
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,6/27/2026,Sat,vs. USA Softball Cherry Bomb Tournament,,All Day,
 Cayla (GC),16UA,MD Heartbreakers 16U,6/27/2026,Sat,vs. Cherry Bomb,,All Day,VA
 Charli Glass (7),11UB,Maryland InteGRITy 2014,6/27/2026,Sat,vs. TBD,,9:00 AM,
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,6/27/2026,Sat,vs. TBD,,9:00 AM,
@@ -283,12 +276,10 @@ Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/5/2026,S
 Claire (GC),16UA,Olney Cougars 16U Anderson,7/9/2026,Thu,vs. Summer Scorcher,,All Day,VA
 Noelle Jennings (9),16UB,Chesapeake Wave,7/9/2026,Thu,vs. TBD,,All Day,
 Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/10/2026,Fri,vs. USA Softball East Coast Showdown,,All Day,VA
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/10/2026,Fri,vs. USA Softball East Coast Showdown,,All Day,
 Cayla (GC),16UA,MD Heartbreakers 16U,7/10/2026,Fri,vs. USA Softball East Coast Showdown,,All Day,VA
 Claire (GC),16UA,Olney Cougars 16U Anderson,7/10/2026,Fri,vs. Summer Scorcher,,All Day,VA
 Noelle Jennings (9),16UB,Chesapeake Wave,7/10/2026,Fri,vs. TBD,,All Day,
 Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/11/2026,Sat,vs. USA Softball East Coast Showdown,,All Day,VA
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/11/2026,Sat,vs. USA Softball East Coast Showdown,,All Day,
 Cayla (GC),16UA,MD Heartbreakers 16U,7/11/2026,Sat,vs. USA Softball East Coast Showdown,,All Day,VA
 Claire (GC),16UA,Olney Cougars 16U Anderson,7/11/2026,Sat,vs. Summer Scorcher,,All Day,VA
 Emery Stup (7),12UA,Maryland Fever 12U Miller,7/11/2026,Sat,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
@@ -299,28 +290,23 @@ Noelle Jennings (9),16UB,Chesapeake Wave,7/11/2026,Sat,vs. TBD,,All Day,
 Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,7/11/2026,Sat,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
 Stella (GC),16UB,Lady Jackets 16B,7/11/2026,Sat,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
 Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/12/2026,Sun,vs. USA Softball East Coast Showdown,,All Day,VA
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/12/2026,Sun,vs. USA Softball East Coast Showdown,,All Day,
 Cayla (GC),16UA,MD Heartbreakers 16U,7/12/2026,Sun,vs. USA Softball East Coast Showdown,,All Day,VA
 Claire (GC),16UA,Olney Cougars 16U Anderson,7/12/2026,Sun,vs. Summer Scorcher,,All Day,VA
 Emery Stup (7),12UA,Maryland Fever 12U Miller,7/12/2026,Sun,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/12/2026,Sun,vs. TBD,,9:00 AM,
 Reagan Willis (8); Eloise Bullen (7),12UA,VA Glory MoCo 12U,7/12/2026,Sun,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
 Stella (GC),16UB,Lady Jackets 16B,7/12/2026,Sun,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/14/2026,Tue,vs. USSSA Eastern National Championship,,All Day,
 Ashley (GC),14UB,Lady Jackets 14B,7/15/2026,Wed,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/15/2026,Wed,vs. USSSA Eastern National Championship,,All Day,
 Cayla (GC),16UA,MD Heartbreakers 16U,7/15/2026,Wed,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Claire (GC),16UA,Olney Cougars 16U Anderson,7/15/2026,Wed,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Emma Chavez (8),13UA,Maryland InteGRITy 13U,7/15/2026,Wed,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Sophia (GC),14UB,Green Wave 14U,7/15/2026,Wed,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Ashley (GC),14UB,Lady Jackets 14B,7/16/2026,Thu,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/16/2026,Thu,vs. USSSA Eastern National Championship,,All Day,
 Cayla (GC),16UA,MD Heartbreakers 16U,7/16/2026,Thu,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Claire (GC),16UA,Olney Cougars 16U Anderson,7/16/2026,Thu,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Emma Chavez (8),13UA,Maryland InteGRITy 13U,7/16/2026,Thu,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Sophia (GC),14UB,Green Wave 14U,7/16/2026,Thu,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Ashley (GC),14UB,Lady Jackets 14B,7/17/2026,Fri,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/17/2026,Fri,vs. USSSA Eastern National Championship,,All Day,
 Cayla (GC),16UA,MD Heartbreakers 16U,7/17/2026,Fri,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Claire (GC),16UA,Olney Cougars 16U Anderson,7/17/2026,Fri,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Emma Chavez (8),13UA,Maryland InteGRITy 13U,7/17/2026,Fri,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
@@ -328,7 +314,6 @@ Noelle Jennings (9),16UB,Chesapeake Wave,7/17/2026,Fri,vs. TBD,,All Day,
 Sophia (GC),14UB,Green Wave 14U,7/17/2026,Fri,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Ashley (GC),14UB,Lady Jackets 14B,7/18/2026,Sat,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/18/2026,Sat,vs. INDEPENDENCE COLLEGE SHOWCASE,,All Day,MD
-Avery Brindley (7),12UA,EC Bullets Moreland 12U,7/18/2026,Sat,vs. USSSA Eastern National Championship,,All Day,
 Cayla (GC),16UA,MD Heartbreakers 16U,7/18/2026,Sat,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Claire (GC),16UA,Olney Cougars 16U Anderson,7/18/2026,Sat,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA
 Emma Chavez (8),13UA,Maryland InteGRITy 13U,7/18/2026,Sat,vs. USA Softball Girls Fast Pitch Eastern Nationals,,All Day,VA

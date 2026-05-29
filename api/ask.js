@@ -35,7 +35,7 @@ Maryland InteGRITy 2014 11UB: GC=0eeB5WGREX13, USSSA=3282722
 Maryland InteGRITy 13U: GC=wbSHwhzi4RlK, USSSA=3286813
 Maryland Fever 12U Miller: GC=D7acJsR8JmC8, USSSA=3274232
 Shockwaves 13U: GC=VyesU37LDftc, USSSA=3295001
-EC Bullets Moreland 12U: GC=AvsmjXALaaZ7, USSSA=3265622
+LLG Uprising 12U: GC=UfpOVEqJfKvH, USSSA=3329117
 Damascus Lady Jackets 12U: GC=AOIWpwzYpkEc, USSSA=3301646
 Shockwaves 11U: GC=7gCpsd5PdpG1, USSSA=3291463`;
 

@@ -24,7 +24,7 @@ Lady Jackets 16B: GC=cMBx3VMn1ljb, USSSA=3294634
 MD Heartbreakers 16U: GC=Ysu91toVIK1i
 Olney Cougars 16U Anderson: GC=MJYrInciK5re, USSSA=3293685
 Olney Cougars 18U: GC=c2j8wp78F4E3, USSSA=3292730
-BCC Flash: GC=XKNsbMzlZFCT, USSSA=3288976
+BCC Flash: GC=f6wjlRqy9snC, USSSA=3288976
 Freedom Firebirds-Petry: GC=UzNkT3EtT07X, USSSA=3291417
 MD Crush National 18U: GC=1LQ6OrNgJBHj
 Olney Cougars 13U: GC=lOgPBdtUcYPH, USSSA=3290870
@@ -36,6 +36,7 @@ Maryland InteGRITy 13U: GC=wbSHwhzi4RlK, USSSA=3286813
 Maryland Fever 12U Miller: GC=D7acJsR8JmC8, USSSA=3274232
 Shockwaves 13U: GC=VyesU37LDftc, USSSA=3295001
 LLG Uprising 12U: GC=UfpOVEqJfKvH, USSSA=3329117
+EYO Lady Hurricanes 12U: GC=EB1QyThbeXR0, USSSA=3276627
 Damascus Lady Jackets 12U: GC=AOIWpwzYpkEc, USSSA=3301646
 Shockwaves 11U: GC=7gCpsd5PdpG1, USSSA=3291463`;
 

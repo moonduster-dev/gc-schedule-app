@@ -17,7 +17,7 @@ OLC Varsity Falcons: GC=kT1L0JpPMNTq
 Shockwaves 16U: GC=Kj2XMuYbN7hC, USSSA=3287164
 STARS Goss 16U: GC=tVsrOQgUknJI, USSSA=3275990
 MD Stars Fastpitch DiM/Parson: GC=QIaPMpW5X4a9, USSSA=3323120
-MD Stars Fastpitch 2029: GC=mlnElpOhkK5q
+MD Stars Fastpitch 2029: GC=5822f9j1wARm
 Green Wave 14U: GC=Jywdg65LyJ9d, USSSA=3278942
 Lady Jackets 14B: GC=aFqm2RprbzeI, USSSA=3286889
 Lady Jackets 16B: GC=cMBx3VMn1ljb, USSSA=3294634

@@ -26,7 +26,7 @@ Olney Cougars 16U Anderson: GC=MJYrInciK5re, USSSA=3293685
 Olney Cougars 18U: GC=c2j8wp78F4E3, USSSA=3292730
 BCC Flash: GC=f6wjlRqy9snC, USSSA=3288976
 Freedom Firebirds-Petry: GC=UzNkT3EtT07X, USSSA=3291417
-MD Crush National 18U: GC=YVyho30UZYaw1
+MD Crush National 18U: GC=YVyho30UZYaw
 Olney Cougars 13U: GC=lOgPBdtUcYPH, USSSA=3290870
 Olney Cougars 14U Richardson: GC=WYkRU5nkcDWr, USSSA=3281448
 Chesapeake Wave 16U: GC=RUICDJUS0xnN, USSSA=3292658

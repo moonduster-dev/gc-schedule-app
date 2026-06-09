@@ -509,11 +509,18 @@ function getIndividualPlayers(playerCell) {
   return playerCell.split(';').map(s => s.trim()).filter(Boolean);
 }
 
+// Normalize team/opponent text so punctuation & spacing differences
+// (e.g. "Olney Cougars 14U - Richardson" vs "Olney Cougars 14U Richardson")
+// don't break head-to-head matching.
+function normTeam(s) {
+  return (s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function buildTeamsByDate() {
   teamsByDate = {};
   allData.forEach(r => {
     const d = r.Date;
-    const t = (r.Team || '').toLowerCase().trim();
+    const t = normTeam(r.Team);
     if (d && t) {
       if (!teamsByDate[d]) teamsByDate[d] = new Set();
       teamsByDate[d].add(t);
@@ -522,8 +529,8 @@ function buildTeamsByDate() {
 }
 
 function isHeadToHead(row) {
-  const myTeam = (row.Team || '').toLowerCase().trim();
-  const opp = (row.Opponent || '').toLowerCase();
+  const myTeam = normTeam(row.Team);
+  const opp = normTeam(row.Opponent);
   const teams = teamsByDate[row.Date] || new Set();
   for (const team of teams) {
     if (team && team !== myTeam && opp.includes(team)) return true;

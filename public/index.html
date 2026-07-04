@@ -123,10 +123,6 @@
 const SHEETS_URL = '/api/schedule';
 
 const EMBEDDED_CSV = `Player,Division,Team,Date,Day,Opponent,Home/Away,Time,Location
-Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,7/1/2026,Wed,vs. CA YardSharks Nat'l - Leavell 18U,Home,4:00 PM,Carroll Butts Athletic Park
-Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,7/1/2026,Wed,vs. Rocky MTN Thunder Morris/McAllister,Home,6:00 PM,Carroll Butts Athletic Park
-Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,7/2/2026,Thu,vs. Elevate Fastpitch Petersen/Wegner 18U,Home,4:00 PM,Northeast Open Space
-Isabel (GC); Giselle (GC),18UA,MD Crush National 18U,7/2/2026,Thu,vs. Nebraska Reign National 18U,Home,6:00 PM,Northeast Open Space
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/4/2026,Sat,vs. Maryland Crush 16U,,9:00 AM,Cedar Lane Park - Field 2
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/4/2026,Sat,vs. PA Elite 16U,,11:50 AM,Cedar Lane Park - Field 2
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/4/2026,Sat,vs. Hot Shots Miles 16U,,1:15 PM,Cedar Lane Park - Field 2
@@ -136,14 +132,18 @@ Mila Louro (7),12UC,EYO Lady Hurricanes 12U,7/8/2026,Wed,"vs. USSSA ""C"" EASTER
 Claire (GC),16UA,Olney Cougars 16U Anderson,7/9/2026,Thu,vs. Summer Scorcher,,All Day,VA
 Keegan Michael (9); Emily Gronvall (8),13UC,Olney Cougars 13UC,7/9/2026,Thu,"vs. USSSA ""C"" EASTERN NATIONALS",,All Day,MD
 Mila Louro (7),12UC,EYO Lady Hurricanes 12U,7/9/2026,Thu,"vs. USSSA ""C"" EASTERN NATIONALS",,All Day,MD
-Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/10/2026,Fri,vs. USA Softball East Coast Showdown,,All Day,VA
-Cayla (GC),16UA,MD Heartbreakers 16U,7/10/2026,Fri,vs. USA Softball East Coast Showdown,,All Day,VA
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/10/2026,Fri,vs. Virginia Intensity Fastpitch 16U,,3:30 PM,Harry G. Daniel Park at Ironbridge - Field 07
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/10/2026,Fri,vs. Misfits,,5:05 PM,Harry G. Daniel Park at Ironbridge - Field 08
+Cayla (GC),16UA,MD Heartbreakers 16U,7/10/2026,Fri,vs. Virginia Elite Fastpitch,,12:00 PM,Harry G. Daniel Park at Ironbridge - Field 06
+Cayla (GC),16UA,MD Heartbreakers 16U,7/10/2026,Fri,vs. Unity 2030 Fields,,5:05 PM,Harry G. Daniel Park at Ironbridge - Field 06
 Claire (GC),16UA,Olney Cougars 16U Anderson,7/10/2026,Fri,vs. Summer Scorcher,,All Day,VA
 Keegan Michael (9); Emily Gronvall (8),13UC,Olney Cougars 13UC,7/10/2026,Fri,"vs. USSSA ""C"" EASTERN NATIONALS",,All Day,MD
 Mila Louro (7),12UC,EYO Lady Hurricanes 12U,7/10/2026,Fri,"vs. USSSA ""C"" EASTERN NATIONALS",,All Day,MD
-Ashley (GC),14UB,Lady Jackets 14B,7/11/2026,Sat,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
-Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/11/2026,Sat,vs. USA Softball East Coast Showdown,,All Day,VA
-Cayla (GC),16UA,MD Heartbreakers 16U,7/11/2026,Sat,vs. USA Softball East Coast Showdown,,All Day,VA
+Ashley (GC),14UB,Lady Jackets 14B,7/11/2026,Sat,vs. Queen Bees 16U,,8:00 AM,Pinesburg Softball Complex - Field 3
+Ashley (GC),14UB,Lady Jackets 14B,7/11/2026,Sat,vs. OC Elite 16U,,11:20 AM,Pinesburg Softball Complex - Field 3
+Ashley (GC),14UB,Lady Jackets 14B,7/11/2026,Sat,vs. Lower Mac Impact,,1:00 PM,Pinesburg Softball Complex - Field 3
+Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/11/2026,Sat,vs. RVA WARRIORS 16U Rittwage,,12:10 PM,Harry G. Daniel Park at Ironbridge - Field 08
+Cayla (GC),16UA,MD Heartbreakers 16U,7/11/2026,Sat,vs. Ironbridge 2829 Honea,,10:35 AM,Harry G. Daniel Park at Ironbridge - Field 06
 Charli Glass (7),11UB,Maryland InteGRITy 2014,7/11/2026,Sat,vs. Delaware Tribe 12U,,8:00 AM,Pyle Center - Memorial
 Charli Glass (7),11UB,Maryland InteGRITy 2014,7/11/2026,Sat,vs. Vikings Smith 11U,,9:25 AM,Pyle Center - Memorial
 Charli Glass (7),11UB,Maryland InteGRITy 2014,7/11/2026,Sat,vs. Bayside Belles 12U,,12:15 PM,Pyle Center - Lyons
@@ -151,7 +151,9 @@ Claire (GC),16UA,Olney Cougars 16U Anderson,7/11/2026,Sat,vs. Summer Scorcher,,A
 Clara (GC),14UB,Freedom Firebirds-Petry,7/11/2026,Sat,vs. Starz Gold Bary 14U,,10:25 AM,North Laurel Park - Field 2
 Clara (GC),14UB,Freedom Firebirds-Petry,7/11/2026,Sat,vs. Honeygo Hurricanes 13U,,2:40 PM,North Laurel Park - Field 2
 Clara (GC),14UB,Freedom Firebirds-Petry,7/11/2026,Sat,vs. Shockwaves 13U,,4:05 PM,North Laurel Park - Field 2
-Emery Stup (7),12UA,Maryland Fever 12U Miller,7/11/2026,Sat,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
+Emery Stup (7),12UA,Maryland Fever 12U Miller,7/11/2026,Sat,vs. Rochester Lady Lions - Tillinghast,,8:00 AM,Antrim Township Community Park - Field 1
+Emery Stup (7),12UA,Maryland Fever 12U Miller,7/11/2026,Sat,vs. Hot Shots - Hendricks,,9:40 AM,Antrim Township Community Park - Field 1
+Emery Stup (7),12UA,Maryland Fever 12U Miller,7/11/2026,Sat,vs. Loudoun Inferno 14U - Moore,,1:00 PM,Antrim Township Community Park - Field 1
 Emma Zhao (8),13UB,Shockwaves 13U,7/11/2026,Sat,vs. Honeygo Hurricanes 13U,,11:50 AM,North Laurel Park - Field 2
 Emma Zhao (8),13UB,Shockwaves 13U,7/11/2026,Sat,vs. Starz Gold Bary 14U,,1:15 PM,North Laurel Park - Field 2
 Emma Zhao (8),13UB,Shockwaves 13U,7/11/2026,Sat,vs. Freedom Firebirds-Petry,,4:05 PM,North Laurel Park - Field 2
@@ -169,9 +171,15 @@ Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/11/2026,
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/11/2026,Sat,vs. Polar Elite 16U Albert,,10:25 AM,Fairland Regional Park - Field 4
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U,7/11/2026,Sat,vs. Maryland Patriots 16U,,1:15 PM,Fairland Regional Park - Field 4
 Mila Louro (7),12UC,EYO Lady Hurricanes 12U,7/11/2026,Sat,"vs. USSSA ""C"" EASTERN NATIONALS",,All Day,MD
-Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,7/11/2026,Sat,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
-Reagan Willis (8); Eloise Bullen (7); Isabella DeVriendt (7); Anna Sardelis (7),12UA,VA Glory MoCo 12U,7/11/2026,Sat,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
-Stella (GC),16UB,Lady Jackets 16B,7/11/2026,Sat,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
+Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,7/11/2026,Sat,vs. Complete Game Academy 14U Angelo,,11:20 AM,Antrim Township Community Park - Field 4
+Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,7/11/2026,Sat,vs. Honeygo Hurricanes 14U Blue,,2:40 PM,Antrim Township Community Park - Field 4
+Olivia Simmons (9); Cara Turner (9),14UA,Olney Cougars 14U Richardson,7/11/2026,Sat,vs. PAL ENFORCERS 14U,,4:20 PM,Antrim Township Community Park - Field 3
+Reagan Willis (8); Eloise Bullen (7); Isabella DeVriendt (7); Anna Sardelis (7),12UA,VA Glory MoCo 12U,7/11/2026,Sat,vs. ShenVal Swarm Crawford,,8:00 AM,Antrim Township Community Park - Field 3
+Reagan Willis (8); Eloise Bullen (7); Isabella DeVriendt (7); Anna Sardelis (7),12UA,VA Glory MoCo 12U,7/11/2026,Sat,vs. Lady Senators 14U Jones,,9:40 AM,Antrim Township Community Park - Field 3
+Reagan Willis (8); Eloise Bullen (7); Isabella DeVriendt (7); Anna Sardelis (7),12UA,VA Glory MoCo 12U,7/11/2026,Sat,vs. Smash it Sports 14 U Burke,,1:00 PM,Antrim Township Community Park - Field 3
+Stella (GC),16UB,Lady Jackets 16B,7/11/2026,Sat,vs. Rise Up 2030,,11:20 AM,Pinesburg Softball Complex - Field 2
+Stella (GC),16UB,Lady Jackets 16B,7/11/2026,Sat,vs. DE Magic Breeden,,2:40 PM,Pinesburg Softball Complex - Field 1
+Stella (GC),16UB,Lady Jackets 16B,7/11/2026,Sat,vs. Flood City Elite,,4:20 PM,Pinesburg Softball Complex - Field 2
 Ashley (GC),14UB,Lady Jackets 14B,7/12/2026,Sun,vs. NATIONAL INVITATIONAL TOURNAMENT,,All Day,MD
 Aubrey (GC),16UA,MD Stars Fastpitch 2029,7/12/2026,Sun,vs. USA Softball East Coast Showdown,,All Day,VA
 Cayla (GC),16UA,MD Heartbreakers 16U,7/12/2026,Sun,vs. USA Softball East Coast Showdown,,All Day,VA

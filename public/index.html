@@ -57,6 +57,11 @@
     <div id="player-filters" class="flex flex-wrap gap-1.5"></div>
     <button onclick="clearPlayerFilter()" class="text-sm text-blue-600 hover:underline ml-1">All</button>
   </div>
+  <div id="unassigned-row" class="hidden items-center gap-2 flex-wrap mt-1">
+    <label class="text-sm font-semibold text-amber-700 uppercase tracking-wide" title="Players with no games in the schedule yet">No Games Yet</label>
+    <div id="unassigned-filters" class="flex flex-wrap gap-1.5"></div>
+  </div>
+  <div id="player-info" class="hidden mt-1.5 text-sm rounded border border-blue-200 bg-blue-50 px-3 py-1.5"></div>
   <div class="flex items-center gap-2 ml-auto">
     <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide">From</label>
     <input type="date" id="date-from" class="text-sm border rounded px-2 py-1 focus:outline-blue-400">
@@ -135,96 +140,125 @@ Cayla (GC),18UA,Heartbreakers 18U Elite,9/12/2026,Sat,vs. PLAYING FUNDS THE CURE
 Charli Glass (7),12UB,Maryland InteGRITy 2014 12U,9/12/2026,Sat,vs. FREE STATE FALL OPEN,,All Day,
 Giselle (GC),18UA,Maryland Crush National 18U,9/12/2026,Sat,vs. PLAYING FUNDS THE CURE BENEFIT,,All Day,"Loudoun County, VA"
 Isabella DeVriendt (7); Reagan Willis (8); Emma Chavez (8); Eloise Bullen (7); Anna Sardelis (7); Emery Stup (7),13UA,VA Glory MoCo 13U,9/12/2026,Sat,vs. PLAYING FUNDS THE CURE BENEFIT,,All Day,"Loudoun County, VA"
-Keegan Michael (9); Emily Gronvall (8),14UB,Olney Cougars 14U,9/12/2026,Sat,vs. FREE STATE FALL OPEN,,All Day,
+Keegan Michael (GC); Emily Gronvall (8),14UB,Olney Cougars 14U,9/12/2026,Sat,vs. FREE STATE FALL OPEN,,All Day,
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),9/12/2026,Sat,vs. FREE STATE FALL OPEN,,All Day,
-Noelle Jennings (9),16UA,Gold Coast Hurricanes-SAC Harris,9/12/2026,Sat,vs. FREE STATE FALL OPEN,,All Day,
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,9/12/2026,Sat,vs. FREE STATE FALL OPEN,,All Day,
+Noelle Jennings (GC),16UA,Gold Coast Hurricanes-SAC Harris,9/12/2026,Sat,vs. FREE STATE FALL OPEN,,All Day,
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,9/12/2026,Sat,vs. FREE STATE FALL OPEN,,All Day,
 Ashley (GC),18UB,Lady Steel South 18U,9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,
 Cayla (GC),18UA,Heartbreakers 18U Elite,9/13/2026,Sun,vs. PLAYING FUNDS THE CURE BENEFIT,,All Day,"Loudoun County, VA"
 Charli Glass (7),12UB,Maryland InteGRITy 2014 12U,9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,
 Giselle (GC),18UA,Maryland Crush National 18U,9/13/2026,Sun,vs. PLAYING FUNDS THE CURE BENEFIT,,All Day,"Loudoun County, VA"
 Isabella DeVriendt (7); Reagan Willis (8); Emma Chavez (8); Eloise Bullen (7); Anna Sardelis (7); Emery Stup (7),13UA,VA Glory MoCo 13U,9/13/2026,Sun,vs. PLAYING FUNDS THE CURE BENEFIT,,All Day,"Loudoun County, VA"
-Keegan Michael (9); Emily Gronvall (8),14UB,Olney Cougars 14U,9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,
+Keegan Michael (GC); Emily Gronvall (8),14UB,Olney Cougars 14U,9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,
-Noelle Jennings (9),16UA,Gold Coast Hurricanes-SAC Harris,9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,
+Noelle Jennings (GC),16UA,Gold Coast Hurricanes-SAC Harris,9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,
 Cayla (GC),18UA,Heartbreakers 18U Elite,9/19/2026,Sat,vs. SHOCK & AWE SHOWCASE,,All Day,"Virginia Beach, VA"
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),9/19/2026,Sat,vs. FALL BRAWL,,All Day,
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,9/19/2026,Sat,vs. VA USSSA / SIX FOUR 3 FALL STATE,,All Day,
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,9/19/2026,Sat,vs. VA USSSA / SIX FOUR 3 FALL STATE,,All Day,
 Cayla (GC),18UA,Heartbreakers 18U Elite,9/20/2026,Sun,vs. SHOCK & AWE SHOWCASE,,All Day,"Virginia Beach, VA"
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),9/20/2026,Sun,vs. FALL BRAWL,,All Day,
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,9/20/2026,Sun,vs. VA USSSA / SIX FOUR 3 FALL STATE,,All Day,
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,9/20/2026,Sun,vs. VA USSSA / SIX FOUR 3 FALL STATE,,All Day,
 Ashley (GC),18UB,Lady Steel South 18U,9/26/2026,Sat,vs. FALL CLASSIC SHOWDOWN (DUSTIN SHEFFLER),,All Day,"Chambersburg, PA"
 Cayla (GC),18UA,Heartbreakers 18U Elite,9/26/2026,Sat,vs. ONE TRUE NATIONAL QUALIFIER,,All Day,"Odenton, MD"
 Charli Glass (7),12UB,Maryland InteGRITy 2014 12U,9/26/2026,Sat,vs. BREAST CANCER AWARENESS NIT,,All Day,
 Isabella DeVriendt (7); Reagan Willis (8); Emma Chavez (8); Eloise Bullen (7); Anna Sardelis (7); Emery Stup (7),13UA,VA Glory MoCo 13U,9/26/2026,Sat,vs. FALL CLASSIC SHOWDOWN (DUSTIN SHEFFLER),,All Day,"Chambersburg, PA"
-Keegan Michael (9); Emily Gronvall (8),14UB,Olney Cougars 14U,9/26/2026,Sat,vs. JUST IN POWER KIDS: HOMERUNS FOR HOPE,,All Day,
+Keegan Michael (GC); Emily Gronvall (8),14UB,Olney Cougars 14U,9/26/2026,Sat,vs. JUST IN POWER KIDS: HOMERUNS FOR HOPE,,All Day,
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),9/26/2026,Sat,vs. ONE TRUE NATIONAL QUALIFIER,,All Day,"Odenton, MD"
-Natalie Coppola (9),16UA,MD Stars Fastpitch Avant 16U,9/26/2026,Sat,vs. VIRGINIA FALL STATE CHAMPIONSHIP,,All Day,"Richmond, VA"
-Noelle Jennings (9),16UA,Gold Coast Hurricanes-SAC Harris,9/26/2026,Sat,vs. VIRGINIA FALL STATE CHAMPIONSHIP,,All Day,"Richmond, VA"
+Natalie Coppola (GC),16UA,MD Stars Fastpitch Avant 16U,9/26/2026,Sat,vs. VIRGINIA FALL STATE CHAMPIONSHIP,,All Day,"Richmond, VA"
+Noelle Jennings (GC),16UA,Gold Coast Hurricanes-SAC Harris,9/26/2026,Sat,vs. VIRGINIA FALL STATE CHAMPIONSHIP,,All Day,"Richmond, VA"
 Ashley (GC),18UB,Lady Steel South 18U,9/27/2026,Sun,vs. FALL CLASSIC SHOWDOWN (DUSTIN SHEFFLER),,All Day,"Chambersburg, PA"
 Cayla (GC),18UA,Heartbreakers 18U Elite,9/27/2026,Sun,vs. ONE TRUE NATIONAL QUALIFIER,,All Day,"Odenton, MD"
 Charli Glass (7),12UB,Maryland InteGRITy 2014 12U,9/27/2026,Sun,vs. BREAST CANCER AWARENESS NIT,,All Day,
 Isabella DeVriendt (7); Reagan Willis (8); Emma Chavez (8); Eloise Bullen (7); Anna Sardelis (7); Emery Stup (7),13UA,VA Glory MoCo 13U,9/27/2026,Sun,vs. FALL CLASSIC SHOWDOWN (DUSTIN SHEFFLER),,All Day,"Chambersburg, PA"
-Keegan Michael (9); Emily Gronvall (8),14UB,Olney Cougars 14U,9/27/2026,Sun,vs. JUST IN POWER KIDS: HOMERUNS FOR HOPE,,All Day,
+Keegan Michael (GC); Emily Gronvall (8),14UB,Olney Cougars 14U,9/27/2026,Sun,vs. JUST IN POWER KIDS: HOMERUNS FOR HOPE,,All Day,
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),9/27/2026,Sun,vs. ONE TRUE NATIONAL QUALIFIER,,All Day,"Odenton, MD"
-Natalie Coppola (9),16UA,MD Stars Fastpitch Avant 16U,9/27/2026,Sun,vs. VIRGINIA FALL STATE CHAMPIONSHIP,,All Day,"Richmond, VA"
-Noelle Jennings (9),16UA,Gold Coast Hurricanes-SAC Harris,9/27/2026,Sun,vs. VIRGINIA FALL STATE CHAMPIONSHIP,,All Day,"Richmond, VA"
+Natalie Coppola (GC),16UA,MD Stars Fastpitch Avant 16U,9/27/2026,Sun,vs. VIRGINIA FALL STATE CHAMPIONSHIP,,All Day,"Richmond, VA"
+Noelle Jennings (GC),16UA,Gold Coast Hurricanes-SAC Harris,9/27/2026,Sun,vs. VIRGINIA FALL STATE CHAMPIONSHIP,,All Day,"Richmond, VA"
 Ashley (GC),18UB,Lady Steel South 18U,10/3/2026,Sat,vs. FEAR THE FASTPITCH - CENTRAL MD,,All Day,
 Isabella DeVriendt (7); Reagan Willis (8); Emma Chavez (8); Eloise Bullen (7); Anna Sardelis (7); Emery Stup (7),13UA,VA Glory MoCo 13U,10/3/2026,Sat,vs. MADISON SMALL MEMORIAL (USSSA - CONFLICT),,All Day,
 Isabella DeVriendt (7); Reagan Willis (8); Emma Chavez (8); Eloise Bullen (7); Anna Sardelis (7); Emery Stup (7),13UA,VA Glory MoCo 13U,10/3/2026,Sat,vs. USA SOFTBALL SUPER SELECT (CONFLICT),,All Day,"Richmond, VA"
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,10/3/2026,Sat,vs. MADISON SMALL MEMORIAL NIT DOUBLE POINTS,,All Day,
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,10/3/2026,Sat,vs. MADISON SMALL MEMORIAL NIT DOUBLE POINTS,,All Day,
 Ashley (GC),18UB,Lady Steel South 18U,10/4/2026,Sun,vs. FEAR THE FASTPITCH - CENTRAL MD,,All Day,
 Isabella DeVriendt (7); Reagan Willis (8); Emma Chavez (8); Eloise Bullen (7); Anna Sardelis (7); Emery Stup (7),13UA,VA Glory MoCo 13U,10/4/2026,Sun,vs. MADISON SMALL MEMORIAL (USSSA - CONFLICT),,All Day,
 Isabella DeVriendt (7); Reagan Willis (8); Emma Chavez (8); Eloise Bullen (7); Anna Sardelis (7); Emery Stup (7),13UA,VA Glory MoCo 13U,10/4/2026,Sun,vs. USA SOFTBALL SUPER SELECT (CONFLICT),,All Day,"Richmond, VA"
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,10/4/2026,Sun,vs. MADISON SMALL MEMORIAL NIT DOUBLE POINTS,,All Day,
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,10/4/2026,Sun,vs. MADISON SMALL MEMORIAL NIT DOUBLE POINTS,,All Day,
 Cayla (GC),18UA,Heartbreakers 18U Elite,10/10/2026,Sat,vs. PUMPKIN SPICE,,All Day,"Loudoun County, VA"
 Giselle (GC),18UA,Maryland Crush National 18U,10/10/2026,Sat,vs. PUMPKIN SPICE,,All Day,"Loudoun County, VA"
-Keegan Michael (9); Emily Gronvall (8),14UB,Olney Cougars 14U,10/10/2026,Sat,vs. PINKOUT IN THE PARK,,All Day,
+Keegan Michael (GC); Emily Gronvall (8),14UB,Olney Cougars 14U,10/10/2026,Sat,vs. PINKOUT IN THE PARK,,All Day,
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),10/10/2026,Sat,vs. PINKOUT IN THE PARK,,All Day,
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,10/10/2026,Sat,vs. PINKOUT IN THE PARK (USSSA - CONFLICT),,All Day,
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,10/10/2026,Sat,vs. PUMPKIN SPICE (CONFLICT),,All Day,"Loudoun County, VA"
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,10/10/2026,Sat,vs. PINKOUT IN THE PARK (USSSA - CONFLICT),,All Day,
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,10/10/2026,Sat,vs. PUMPKIN SPICE (CONFLICT),,All Day,"Loudoun County, VA"
 Cayla (GC),18UA,Heartbreakers 18U Elite,10/11/2026,Sun,vs. PUMPKIN SPICE,,All Day,"Loudoun County, VA"
 Giselle (GC),18UA,Maryland Crush National 18U,10/11/2026,Sun,vs. PUMPKIN SPICE,,All Day,"Loudoun County, VA"
-Keegan Michael (9); Emily Gronvall (8),14UB,Olney Cougars 14U,10/11/2026,Sun,vs. PINKOUT IN THE PARK,,All Day,
+Keegan Michael (GC); Emily Gronvall (8),14UB,Olney Cougars 14U,10/11/2026,Sun,vs. PINKOUT IN THE PARK,,All Day,
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),10/11/2026,Sun,vs. PINKOUT IN THE PARK,,All Day,
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,10/11/2026,Sun,vs. PINKOUT IN THE PARK (USSSA - CONFLICT),,All Day,
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,10/11/2026,Sun,vs. PUMPKIN SPICE (CONFLICT),,All Day,"Loudoun County, VA"
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,10/11/2026,Sun,vs. PINKOUT IN THE PARK (USSSA - CONFLICT),,All Day,
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,10/11/2026,Sun,vs. PUMPKIN SPICE (CONFLICT),,All Day,"Loudoun County, VA"
 Ashley (GC),18UB,Lady Steel South 18U,10/17/2026,Sat,vs. MID-ATLANTIC FALL STATE CHAMPIONSHIPS,,All Day,
 Charli Glass (7),12UB,Maryland InteGRITy 2014 12U,10/17/2026,Sat,vs. HALLOWEEN HAVOC,,All Day,
 Giselle (GC),18UA,Maryland Crush National 18U,10/17/2026,Sat,vs. SHOWCASE SHOWDOWN TEAM CAMP,,All Day,"Virginia Beach, VA"
 Isabella DeVriendt (7); Reagan Willis (8); Emma Chavez (8); Eloise Bullen (7); Anna Sardelis (7); Emery Stup (7),13UA,VA Glory MoCo 13U,10/17/2026,Sat,vs. MID-ATLANTIC FALL STATE CHAMPIONSHIPS,,All Day,
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,10/17/2026,Sat,vs. MID-ATLANTIC FALL STATE CHAMPIONSHIPS,,All Day,
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,10/17/2026,Sat,vs. MID-ATLANTIC FALL STATE CHAMPIONSHIPS,,All Day,
 Ashley (GC),18UB,Lady Steel South 18U,10/18/2026,Sun,vs. MID-ATLANTIC FALL STATE CHAMPIONSHIPS,,All Day,
 Charli Glass (7),12UB,Maryland InteGRITy 2014 12U,10/18/2026,Sun,vs. HALLOWEEN HAVOC,,All Day,
 Giselle (GC),18UA,Maryland Crush National 18U,10/18/2026,Sun,vs. SHOWCASE SHOWDOWN TEAM CAMP,,All Day,"Virginia Beach, VA"
 Isabella DeVriendt (7); Reagan Willis (8); Emma Chavez (8); Eloise Bullen (7); Anna Sardelis (7); Emery Stup (7),13UA,VA Glory MoCo 13U,10/18/2026,Sun,vs. MID-ATLANTIC FALL STATE CHAMPIONSHIPS,,All Day,
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,10/18/2026,Sun,vs. MID-ATLANTIC FALL STATE CHAMPIONSHIPS,,All Day,
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,10/18/2026,Sun,vs. MID-ATLANTIC FALL STATE CHAMPIONSHIPS,,All Day,
 Ashley (GC),18UB,Lady Steel South 18U,10/24/2026,Sat,vs. SPOOKTACULER SHOWDOWN,,All Day,"Flemington/Whitehouse/Hillsborough, NJ"
 Charli Glass (7),12UB,Maryland InteGRITy 2014 12U,10/24/2026,Sat,vs. HALLOWEEN BASH,,All Day,
-Keegan Michael (9); Emily Gronvall (8),14UB,Olney Cougars 14U,10/24/2026,Sat,vs. OKTOBERFAST,,All Day,
-Noelle Jennings (9),16UA,Gold Coast Hurricanes-SAC Harris,10/24/2026,Sat,vs. OKTOBERFAST,,All Day,
+Keegan Michael (GC); Emily Gronvall (8),14UB,Olney Cougars 14U,10/24/2026,Sat,vs. OKTOBERFAST,,All Day,
+Noelle Jennings (GC),16UA,Gold Coast Hurricanes-SAC Harris,10/24/2026,Sat,vs. OKTOBERFAST,,All Day,
 Ashley (GC),18UB,Lady Steel South 18U,10/25/2026,Sun,vs. SPOOKTACULER SHOWDOWN,,All Day,"Flemington/Whitehouse/Hillsborough, NJ"
 Charli Glass (7),12UB,Maryland InteGRITy 2014 12U,10/25/2026,Sun,vs. HALLOWEEN BASH,,All Day,
-Keegan Michael (9); Emily Gronvall (8),14UB,Olney Cougars 14U,10/25/2026,Sun,vs. OKTOBERFAST,,All Day,
-Noelle Jennings (9),16UA,Gold Coast Hurricanes-SAC Harris,10/25/2026,Sun,vs. OKTOBERFAST,,All Day,
+Keegan Michael (GC); Emily Gronvall (8),14UB,Olney Cougars 14U,10/25/2026,Sun,vs. OKTOBERFAST,,All Day,
+Noelle Jennings (GC),16UA,Gold Coast Hurricanes-SAC Harris,10/25/2026,Sun,vs. OKTOBERFAST,,All Day,
 Ashley (GC),18UB,Lady Steel South 18U,10/31/2026,Sat,vs. FIELD OF SCREAMS HALLOWEEN TIKTOK CHALLENGE (PA),,All Day,
 Cayla (GC),18UA,Heartbreakers 18U Elite,10/31/2026,Sat,vs. FROZEN FINALE,,All Day,"Loudoun County, VA"
 Giselle (GC),18UA,Maryland Crush National 18U,10/31/2026,Sat,vs. FROZEN FINALE,,All Day,"Loudoun County, VA"
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),10/31/2026,Sat,vs. FROZEN FINALE,,All Day,"Loudoun County, VA"
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,10/31/2026,Sat,vs. FROZEN FINALE,,All Day,"Loudoun County, VA"
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,10/31/2026,Sat,vs. FROZEN FINALE,,All Day,"Loudoun County, VA"
 Ashley (GC),18UB,Lady Steel South 18U,11/1/2026,Sun,vs. FIELD OF SCREAMS HALLOWEEN TIKTOK CHALLENGE (PA),,All Day,
 Cayla (GC),18UA,Heartbreakers 18U Elite,11/1/2026,Sun,vs. FROZEN FINALE,,All Day,"Loudoun County, VA"
 Giselle (GC),18UA,Maryland Crush National 18U,11/1/2026,Sun,vs. FROZEN FINALE,,All Day,"Loudoun County, VA"
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),11/1/2026,Sun,vs. FROZEN FINALE,,All Day,"Loudoun County, VA"
-Olivia Simmons (9); Cara Turner (9),16UB,Green Wave,11/1/2026,Sun,vs. FROZEN FINALE,,All Day,"Loudoun County, VA"
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave,11/1/2026,Sun,vs. FROZEN FINALE,,All Day,"Loudoun County, VA"
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),11/7/2026,Sat,vs. CROWN TROPHY FALL CHALLENGE NIT,,All Day,
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),11/8/2026,Sun,vs. CROWN TROPHY FALL CHALLENGE NIT,,All Day,
 Cayla (GC),18UA,Heartbreakers 18U Elite,11/14/2026,Sat,vs. CAPITAL CITY SHOWCASE,,All Day,"Raleigh, NC"
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),11/14/2026,Sat,vs. ADVENTURE'S NORTHEAST CHAMPIONSHIP,,All Day,
 Cayla (GC),18UA,Heartbreakers 18U Elite,11/15/2026,Sun,vs. CAPITAL CITY SHOWCASE,,All Day,"Raleigh, NC"
 Madison (GC); Mairin (GC); Molly (GC); Paige (GC),16UB,STARS Goss 16U (2028-2029),11/15/2026,Sun,vs. ADVENTURE'S NORTHEAST CHAMPIONSHIP,,All Day,
-Keegan Michael (9); Emily Gronvall (8),14UB,Olney Cougars 14U,2/28/2027,Sun,vs. MARCH CLASH,,All Day,`;
+Keegan Michael (GC); Emily Gronvall (8),14UB,Olney Cougars 14U,2/28/2027,Sun,vs. MARCH CLASH,,All Day,`;
+
+// Players tracked in the roster but with no games in the schedule yet.
+// Patched by update_app.py from the UNMATCHED CANDIDATES block of the season sheet.
+const EMBEDDED_UNASSIGNED = [
+  {
+    "player": "Avery Brindley (7)",
+    "division": "12UA",
+    "team": "LLG Uprising 12U",
+    "note": "no URLs yet - schedule not retrievable"
+  },
+  {
+    "player": "Savannah Seonarain (7)",
+    "division": "12UB",
+    "team": "Shockwaves 12U",
+    "note": "GC page live - no games posted yet"
+  },
+  {
+    "player": "Aleida Kerkhoven (7)",
+    "division": "",
+    "team": "",
+    "note": "no 2027 team yet"
+  },
+  {
+    "player": "Claire (GC)",
+    "division": "18UA",
+    "team": "Olney Cougars Anderson 18U",
+    "note": "GC URL on file - schedule not yet checked"
+  }
+];
 </script>
 
 <!-- ===== APP LOGIC ===== -->
@@ -407,9 +441,69 @@ function buildPlayerFilters() {
     btn.className = 'player-filter-btn text-sm px-2.5 py-0.5 rounded-full border transition-all';
     btn.style.cssText = `background:${c.bg};color:${c.text};border-color:${c.dot};`;
     btn.textContent = player;
+    const info = playerTeam(player);
+    if (info) btn.title = `${info.team} — ${info.division}`;
     btn.onclick = () => togglePlayerFilter(player, btn);
     container.appendChild(btn);
   });
+
+  buildUnassignedFilters();
+}
+
+// ---------- player -> team / level ----------
+// Built from the schedule rows; unassigned players fall back to EMBEDDED_UNASSIGNED.
+function playerTeam(player) {
+  const row = allData.find(r => getIndividualPlayers(r.Player).includes(player));
+  if (row) return { team: row.Team || '', division: row.Division || '', scheduled: true };
+  const u = EMBEDDED_UNASSIGNED.find(x => x.player === player);
+  if (u) return { team: u.team || '', division: u.division || '', scheduled: false, note: u.note || '' };
+  return null;
+}
+
+function buildUnassignedFilters() {
+  const row = document.getElementById('unassigned-row');
+  const container = document.getElementById('unassigned-filters');
+  if (!container) return;
+  container.innerHTML = '';
+  if (!EMBEDDED_UNASSIGNED.length) { row.classList.add('hidden'); return; }
+  row.classList.remove('hidden');
+  row.classList.add('flex');
+
+  EMBEDDED_UNASSIGNED.forEach(u => {
+    const btn = document.createElement('button');
+    btn.className = 'unassigned-btn text-sm px-2.5 py-0.5 rounded-full border border-dashed transition-all';
+    btn.style.cssText = 'background:#fff;color:#92400e;border-color:#d97706;';
+    btn.textContent = u.player;
+    btn.title = u.team ? `${u.team}${u.division ? ' — ' + u.division : ''}` : 'No team yet';
+    btn.onclick = () => showPlayerInfo(u.player);
+    container.appendChild(btn);
+  });
+}
+
+// Panel under the filter bar naming the team + level of whoever was clicked.
+function showPlayerInfo(player) {
+  const el = document.getElementById('player-info');
+  if (!el) return;
+  const info = playerTeam(player);
+  if (!info) { el.classList.add('hidden'); return; }
+
+  const lvl = info.division ? `<span class="text-gray-500">·</span> <span class="font-medium">${escHtml(info.division)}</span>` : '';
+  if (info.scheduled) {
+    const n = allData.filter(r => getIndividualPlayers(r.Player).includes(player)).length;
+    el.innerHTML = `<span class="font-bold">${escHtml(player)}</span> <span class="text-gray-500">—</span> `
+      + `<span class="font-semibold text-blue-800">${escHtml(info.team)}</span> ${lvl}`
+      + ` <span class="text-gray-500 ml-1">(${n} game${n !== 1 ? 's' : ''})</span>`;
+    el.className = 'mt-1.5 text-sm rounded border border-blue-200 bg-blue-50 px-3 py-1.5';
+  } else {
+    const team = info.team
+      ? `<span class="font-semibold text-amber-900">${escHtml(info.team)}</span> ${lvl}`
+      : `<span class="italic text-amber-900">No team yet</span>`;
+    el.innerHTML = `<span class="font-bold">${escHtml(player)}</span> <span class="text-gray-500">—</span> ${team}`
+      + (info.note ? ` <span class="text-amber-700 ml-1">— ${escHtml(info.note)}</span>` : '')
+      + ` <span class="text-amber-700 ml-1">(no games scheduled)</span>`;
+    el.className = 'mt-1.5 text-sm rounded border border-amber-300 bg-amber-50 px-3 py-1.5';
+  }
+  el.classList.remove('hidden');
 }
 
 function togglePlayerFilter(player, btn) {
@@ -424,6 +518,7 @@ function togglePlayerFilter(player, btn) {
     btn.style.boxShadow = '0 0 0 2px currentColor';
     btn.style.fontWeight = '700';
   }
+  showPlayerInfo(player);
   applyFilters();
 }
 
@@ -433,6 +528,8 @@ function clearPlayerFilter() {
     b.style.boxShadow = '';
     b.style.fontWeight = '';
   });
+  const info = document.getElementById('player-info');
+  if (info) info.classList.add('hidden');
   applyFilters();
 }
 

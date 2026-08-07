@@ -58,8 +58,8 @@
     <button onclick="clearPlayerFilter()" class="text-sm text-blue-600 hover:underline ml-1">All</button>
   </div>
   <div id="unassigned-row" class="hidden items-center gap-2 flex-wrap mt-1">
-    <label class="text-sm font-semibold text-amber-700 uppercase tracking-wide" title="Players with no games in the schedule yet">No Games Yet</label>
-    <div id="unassigned-filters" class="flex flex-wrap gap-1.5"></div>
+    <label class="text-sm font-semibold text-gray-600 uppercase tracking-wide" title="Players with no games in the schedule yet">Unscheduled</label>
+    <div id="unassigned-filters" class="flex flex-wrap gap-1.5 items-center"></div>
   </div>
   <div id="player-info" class="hidden mt-1.5 text-sm rounded border border-blue-200 bg-blue-50 px-3 py-1.5"></div>
   <div class="flex items-center gap-2 ml-auto">
@@ -120,6 +120,18 @@
     </table>
   </div>
   <p id="no-results" class="hidden text-center text-gray-400 py-10">No games match the current filters.</p>
+</div>
+
+<!-- ===== PLAYER MODAL ===== -->
+<div id="player-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+     style="background:rgba(15,23,42,.55)" onclick="if(event.target===this)closePlayerModal()">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+    <div class="flex items-center gap-3 px-5 py-3 bg-blue-900 text-white">
+      <h3 id="player-modal-title" class="text-lg font-bold flex-1"></h3>
+      <button onclick="closePlayerModal()" class="text-blue-200 hover:text-white text-2xl leading-none" title="Close">&times;</button>
+    </div>
+    <div id="player-modal-body" class="px-5 py-4"></div>
+  </div>
 </div>
 
 
@@ -547,15 +559,31 @@ function buildUnassignedFilters() {
   row.classList.remove('hidden');
   row.classList.add('flex');
 
-  EMBEDDED_UNASSIGNED.forEach(u => {
-    const btn = document.createElement('button');
-    btn.className = 'unassigned-btn text-sm px-2.5 py-0.5 rounded-full border border-dashed transition-all';
-    btn.style.cssText = 'background:#fff;color:#92400e;border-color:#d97706;';
-    btn.textContent = u.player;
-    btn.title = u.team ? `${u.team}${u.division ? ' — ' + u.division : ''}` : 'No team yet';
-    btn.onclick = () => showPlayerInfo(u.player);
-    container.appendChild(btn);
-  });
+  // Two distinct states: on a team but nothing scheduled, vs. no team at all.
+  const hasTeam = EMBEDDED_UNASSIGNED.filter(u => u.team);
+  const noTeam  = EMBEDDED_UNASSIGNED.filter(u => !u.team);
+
+  const addGroup = (label, items, css, labelCss) => {
+    if (!items.length) return;
+    const lb = document.createElement('span');
+    lb.className = 'text-xs font-bold uppercase tracking-wider self-center mx-1 ' + labelCss;
+    lb.textContent = label;
+    container.appendChild(lb);
+    items.forEach(u => {
+      const btn = document.createElement('button');
+      btn.className = 'unassigned-btn text-sm px-2.5 py-0.5 rounded-full border border-dashed transition-all';
+      btn.style.cssText = css;
+      btn.textContent = u.player;
+      btn.title = u.team ? `${u.team}${u.division ? ' — ' + u.division : ''}` : 'No team yet';
+      btn.onclick = () => openPlayerModal(u.player);
+      container.appendChild(btn);
+    });
+  };
+
+  addGroup(`Team set, no games (${hasTeam.length})`, hasTeam,
+           'background:#fff;color:#92400e;border-color:#d97706;', 'text-amber-700');
+  addGroup(`No team yet (${noTeam.length})`, noTeam,
+           'background:#fff;color:#6b7280;border-color:#9ca3af;', 'text-gray-500');
 }
 
 // Panel under the filter bar naming the team + level of whoever was clicked.
@@ -658,6 +686,55 @@ function makeMapLink(location) {
   return `<a href="https://www.google.com/maps/search/?api=1&query=${query}" target="_blank" rel="noopener" class="location-link" title="Open in Google Maps">📍 ${escHtml(location)}</a>`;
 }
 
+function escAttr(s) {
+  return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+}
+
+// ---------- player modal (opened from a name in the schedule table) ----------
+function openPlayerModal(player) {
+  const info = playerTeam(player);
+  const games = allData.filter(r => getIndividualPlayers(r.Player).includes(player));
+  const body = document.getElementById('player-modal-body');
+  const title = document.getElementById('player-modal-title');
+  title.textContent = player;
+
+  let html = '';
+  if (info && info.team) {
+    html += `<div class="text-lg font-semibold text-blue-900">${escHtml(info.team)}</div>`;
+    if (info.division) html += `<div class="text-sm text-gray-500 mt-0.5">Division / Level: <span class="font-semibold text-gray-800">${escHtml(info.division)}</span></div>`;
+  } else {
+    html += `<div class="text-lg font-semibold text-amber-800 italic">No team yet</div>`;
+  }
+  if (info && !info.scheduled) {
+    html += `<div class="mt-2 text-sm rounded bg-amber-50 border border-amber-200 px-3 py-2 text-amber-900">`
+          + (info.note ? escHtml(info.note) : 'No games scheduled yet') + `</div>`;
+  }
+
+  if (games.length) {
+    const teammates = new Set();
+    games.forEach(g => getIndividualPlayers(g.Player).forEach(t => { if (t !== player) teammates.add(t); }));
+    html += `<div class="mt-3 text-sm text-gray-500">${games.length} game${games.length !== 1 ? 's' : ''} scheduled`
+          + ` <span class="text-gray-400">·</span> next: <span class="font-semibold text-gray-800">${escHtml(games[0].Date)}</span></div>`;
+    if (teammates.size) {
+      html += `<div class="mt-2 text-sm text-gray-500">Teammates: <span class="text-gray-800">${escHtml([...teammates].join(', '))}</span></div>`;
+    }
+    html += `<div class="mt-3 max-h-56 overflow-y-auto border-t pt-2">`;
+    games.slice(0, 40).forEach(g => {
+      html += `<div class="flex gap-2 text-sm py-1 border-b border-gray-100">`
+            + `<span class="text-gray-500 w-24 flex-shrink-0">${escHtml(g.Day || '')} ${escHtml(g.Date)}</span>`
+            + `<span class="flex-1">${escHtml(g.Opponent || '')}</span>`
+            + `<span class="text-gray-500 w-20 text-right flex-shrink-0">${escHtml(g.Time || '')}</span></div>`;
+    });
+    html += `</div>`;
+  }
+  body.innerHTML = html;
+  document.getElementById('player-modal').classList.remove('hidden');
+}
+
+function closePlayerModal() {
+  document.getElementById('player-modal').classList.add('hidden');
+}
+
 function escHtml(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -694,7 +771,11 @@ function renderTable() {
     const playerChips = getIndividualPlayers(row.Player).map(p => {
       const gc = allData.find(r => getIndividualPlayers(r.Player).includes(p))?.Player || p;
       const pc = colorMap[gc] || PLAYER_COLORS[0];
-      return `<span class="inline-block text-sm px-2 py-0.5 rounded-full font-medium mr-0.5 mb-0.5" style="background:${pc.bg};color:${pc.text};">${escHtml(p)}</span>`;
+      const inf = playerTeam(p);
+      const tip = inf ? `${inf.team || 'No team yet'}${inf.division ? ' — ' + inf.division : ''}` : '';
+      return `<span onclick="openPlayerModal('${escAttr(p)}')" title="${escHtml(tip)}"`
+        + ` class="inline-block text-sm px-2 py-0.5 rounded-full font-medium mr-0.5 mb-0.5 cursor-pointer hover:ring-2 hover:ring-offset-1"`
+        + ` style="background:${pc.bg};color:${pc.text};">${escHtml(p)}</span>`;
     }).join('');
 
     return `<tr class="${borderTop} ${matchup ? 'row-matchup' : 'hover:bg-yellow-50'} transition-colors">

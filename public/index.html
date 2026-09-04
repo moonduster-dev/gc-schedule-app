@@ -191,7 +191,7 @@ Noelle Jennings (GC); Sophia (GC),16UA,Gold Coast Hurricanes-SAC Harris,9/12/202
 Noelle Jennings (GC); Sophia (GC),16UA,Gold Coast Hurricanes-SAC Harris,9/12/2026,Sat,vs. Harundale Lady Hawks 16b,,5:30 PM,"Centennial Park West - Field 4, 4651 Centennial Ln, Ellicott City MD"
 Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave 16U,9/12/2026,Sat,vs. Gold Coast Hurricanes 16u Miller,,9:00 AM,"Centennial Park West - Field 2, 4651 Centennial Ln, Ellicott City MD"
 Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave 16U,9/12/2026,Sat,vs. Dmv Dream 16u - Tomlin,,11:50 AM,"Centennial Park West - Field 3, 4651 Centennial Ln, Ellicott City MD"
-Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave 16U,9/12/2026,Sat,vs. Stars Softball Goss,,2:40 PM,"Centennial Park West - Field 3, 4651 Centennial Ln, Ellicott City MD"
+Olivia Simmons (GC); Cara Turner (GC),16UB,Green Wave 16U,9/12/2026,Sat,vs. STARS Goss 16U (2028-2029),,2:40 PM,"Centennial Park West - Field 3, 4651 Centennial Ln, Ellicott City MD"
 Aleida Kerkhoven (7),12UC,Maryland Heat 12U,9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,"Central Maryland, MD"
 Ashley (GC),18UB,Lady Steel South 18U,9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,"Central Maryland, MD"
 Aubre Guy (8),13UA,Maryland Fever 13U Miller,9/13/2026,Sun,vs. FREE STATE FALL OPEN,,All Day,"Central Maryland, MD"
@@ -565,10 +565,11 @@ function buildTeamsByDate() {
 
 function isHeadToHead(row) {
   const myTeam = normTeam(row.Team);
-  const opp = normTeam(row.Opponent);
+  const opp = normTeam(row.Opponent).replace(/^(vs |@ )/, '').trim();
   const teams = teamsByDate[row.Date] || new Set();
   for (const team of teams) {
-    if (team && team !== myTeam && opp.includes(team)) return true;
+    if (!team || team === myTeam) continue;
+    if (opp.includes(team) || team.includes(opp)) return true;
   }
   return false;
 }
